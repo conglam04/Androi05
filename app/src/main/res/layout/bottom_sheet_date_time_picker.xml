@@ -1,295 +1,320 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@drawable/bg_bottom_sheet"
-    android:paddingTop="12dp"
-    android:paddingBottom="24dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:fillViewport="true"
+    android:paddingStart="@dimen/spacing_normal"
+    android:paddingEnd="@dimen/spacing_normal"
+    android:paddingTop="@dimen/spacing_medium"
+    android:paddingBottom="@dimen/spacing_large">
 
-    <!-- Top bar: close - title - OK -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="8dp">
-
-        <ImageButton
-            android:id="@+id/btnClose"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_close"
-            android:contentDescription="Đóng" />
-
-        <TextView
-            android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Ngày &amp; Giờ"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="@color/text_primary" />
-
-        <ImageButton
-            android:id="@+id/btnOk"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_check"
-            android:contentDescription="Chọn" />
-    </RelativeLayout>
-
-    <!-- Calendar -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@color/card_background"
-        android:padding="12dp"
-        android:clipToPadding="false"
-        android:clipChildren="false">
-
-        <!-- Android CalendarView (simple) - thay thế bằng custom calendar lib nếu cần -->
-        <CalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:showWeekNumber="false" />
-    </FrameLayout>
-
-    <!-- Quick chips (Horizontal scroll) -->
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="false"
-        android:scrollbars="none"
-        android:layout_marginBottom="12dp">
-
-        <LinearLayout
-            android:id="@+id/quickChipsContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- Example chip view: style with rounded background (use drawable/bg_chip) -->
-            <TextView
-                android:id="@+id/chip_none"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginEnd="8dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_gray"
-                android:text="Không hẹn hò"
-                android:textColor="@color/text_primary" />
-
-            <TextView
-                android:id="@+id/chip_today"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginEnd="8dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_selected"
-                android:text="Hôm nay"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:id="@+id/chip_tomorrow"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginEnd="8dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_gray"
-                android:text="Ngày mai"
-                android:textColor="@color/text_primary" />
-
-            <TextView
-                android:id="@+id/chip_sunday"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginEnd="8dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_gray"
-                android:text="Chủ nhật này"
-                android:textColor="@color/text_primary" />
-
-            <TextView
-                android:id="@+id/chip_3days"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginEnd="8dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_gray"
-                android:text="3 ngày sau"
-                android:textColor="@color/text_primary" />
-
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- Options card: Time / Reminder / Repeat -->
     <LinearLayout
-        android:id="@+id/optionsCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/card_background"
-        android:padding="8dp"
-        android:elevation="2dp">
+        android:orientation="vertical">
 
-        <!-- Row: Time -->
-        <LinearLayout
-            android:id="@+id/row_time"
+        <!-- Top bar: close - title - OK -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:layout_height="@dimen/icon_size_large"
+            android:layout_marginBottom="@dimen/spacing_small">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_clock"
-                app:tint="@color/icon_tint" />
-
-            <TextView
-                android:id="@+id/label_time"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Thời gian"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary" />
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_close"
+                android:padding="@dimen/spacing_small"
+                android:contentDescription="Đóng" />
 
             <TextView
-                android:id="@+id/value_time"
+                android:id="@+id/textTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Không"
-                android:textColor="@color/text_secondary" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_chevron_right"
-                android:tint="@color/icon_tint"
-                android:layout_marginStart="8dp"
-                tools:ignore="UseAppTint" />
-        </LinearLayout>
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider" />
-
-        <!-- Row: Reminder -->
-        <LinearLayout
-            android:id="@+id/row_reminder"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_bell"
-                app:tint="@color/icon_tint" />
-
-            <TextView
-                android:id="@+id/label_reminder"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Lời nhắc lúc"
-                android:textSize="16sp"
+                android:layout_centerInParent="true"
+                android:text="Ngày &amp; Giờ"
+                android:textStyle="bold"
+                android:textSize="@dimen/text_size_large"
                 android:textColor="@color/text_primary" />
 
-            <TextView
-                android:id="@+id/value_reminder"
+            <ImageButton
+                android:id="@+id/btnOk"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/black"
+                android:src="@drawable/ic_check"
+                android:padding="@dimen/spacing_small"
+                android:contentDescription="Chọn" />
+        </RelativeLayout>
+
+        <!-- Calendar card -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_small"
+            android:background="@color/card_background"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:padding="@dimen/spacing_medium">
+
+            <CalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:showWeekNumber="false" />
+        </FrameLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="false"
+            android:scrollbars="none"
+            android:layout_marginBottom="@dimen/spacing_medium">
+
+            <LinearLayout
+                android:id="@+id/quickChipsContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Không"
-                android:textColor="@color/text_secondary" />
+                android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_chevron_right"
-                android:layout_marginStart="8dp"
-                app:tint="@color/icon_tint" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/chip_none"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/chip_height"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:paddingLeft="@dimen/chip_padding_horizontal"
+                    android:paddingRight="@dimen/chip_padding_horizontal"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/text_size_normal"
+                    android:background="@drawable/bg_chip_gray"
+                    android:text="Không hẹn hò"
+                    android:textColor="@color/text_primary" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider" />
+                <TextView
+                    android:id="@+id/chip_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/chip_height"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:paddingLeft="@dimen/chip_padding_horizontal"
+                    android:paddingRight="@dimen/chip_padding_horizontal"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/text_size_normal"
+                    android:background="@drawable/bg_chip_selected"
+                    android:text="Hôm nay"
+                    android:textColor="@color/white" />
 
-        <!-- Row: Repeat -->
+                <TextView
+                    android:id="@+id/chip_tomorrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/chip_height"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:paddingLeft="@dimen/chip_padding_horizontal"
+                    android:paddingRight="@dimen/chip_padding_horizontal"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/text_size_normal"
+                    android:background="@drawable/bg_chip_gray"
+                    android:text="Ngày mai"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/chip_sunday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/chip_height"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:paddingLeft="@dimen/chip_padding_horizontal"
+                    android:paddingRight="@dimen/chip_padding_horizontal"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/text_size_normal"
+                    android:background="@drawable/bg_chip_gray"
+                    android:text="Chủ nhật này"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/chip_3days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/chip_height"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:paddingLeft="@dimen/chip_padding_horizontal"
+                    android:paddingRight="@dimen/chip_padding_horizontal"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/text_size_normal"
+                    android:background="@drawable/bg_chip_gray"
+                    android:text="3 ngày sau"
+                    android:textColor="@color/text_primary" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Options card: Time / Reminder / Repeat -->
         <LinearLayout
-            android:id="@+id/row_repeat"
+            android:id="@+id/optionsCard"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/card_background"
+            android:padding="8dp"
+            android:elevation="2dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_repeat"
-                app:tint="@color/icon_tint" />
+            <!-- Row: Time -->
+            <LinearLayout
+                android:id="@+id/row_time"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
-            <TextView
-                android:id="@+id/label_repeat"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:text="Lặp lại"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_clock"
+                    app:tint="@color/icon_tint" />
 
-            <TextView
-                android:id="@+id/value_repeat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Không"
-                android:textColor="@color/text_secondary" />
+                <TextView
+                    android:id="@+id/label_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Thời gian"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_chevron_right"
-                android:layout_marginStart="8dp"
-                app:tint="@color/icon_tint" />
+                <TextView
+                    android:id="@+id/value_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Không"
+                    android:textColor="@color/text_secondary" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    android:tint="@color/icon_tint"
+                    android:layout_marginStart="8dp"
+                    tools:ignore="UseAppTint" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
+
+            <!-- Row: Reminder -->
+            <LinearLayout
+                android:id="@+id/row_reminder"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_bell"
+                    app:tint="@color/icon_tint" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/label_reminder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nhắc nhở"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="(cùng ngày với task)"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/value_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Không"
+                    android:textColor="@color/text_secondary" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    android:layout_marginStart="8dp"
+                    app:tint="@color/icon_tint" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
+
+            <!-- Row: Repeat -->
+            <LinearLayout
+                android:id="@+id/row_repeat"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_repeat"
+                    app:tint="@color/icon_tint" />
+
+                <TextView
+                    android:id="@+id/label_repeat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Lặp lại"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/value_repeat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Không"
+                    android:textColor="@color/text_secondary" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    android:layout_marginStart="8dp"
+                    app:tint="@color/icon_tint" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

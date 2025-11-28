@@ -48,7 +48,7 @@ public class ThongKeActivity extends BaseActivity {
         mappingViews();
 
         // 2. Setup Bottom Navigation
-        setupBottomNav(R.id.nav_profile);
+        setupBottomNav(R.id.navigation_profile);
 
         // 3. Xử lý giao diện User (Login/Logout)
         updateUserUI();

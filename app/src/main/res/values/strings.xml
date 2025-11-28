@@ -6,4 +6,6 @@
         <item>30 ngày</item>
         <item>365 ngày</item>
     </string-array>
+    <string name="start">Bắt đầu</string>
+    <string name="pause">Tạm dừng</string>
 </resources>

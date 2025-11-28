@@ -1,73 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.todolist.Ui.widget.SwipeRevealLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    android:layout_marginBottom="@dimen/task_item_margin">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Background layer with action buttons -->
+    <LinearLayout
+        android:id="@+id/layoutBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:orientation="horizontal"
+        android:paddingEnd="@dimen/spacing_normal">
+
+        <ImageButton
+            android:id="@+id/btnStar"
+            android:layout_width="@dimen/icon_size_action"
+            android:layout_height="match_parent"
+            android:background="@color/blue_light"
+            android:src="@drawable/ic_star"
+            app:tint="@android:color/white"
+            android:contentDescription="Star"/>
+
+        <ImageButton
+            android:id="@+id/btnCalendar"
+            android:layout_width="@dimen/icon_size_action"
+            android:layout_height="match_parent"
+            android:background="@color/blue"
+            android:src="@drawable/ic_calendar"
+            app:tint="@android:color/white"
+            android:contentDescription="Calendar"/>
+
+        <ImageButton
+            android:id="@+id/btnFocus"
+            android:layout_width="@dimen/icon_size_action"
+            android:layout_height="match_parent"
+            android:background="@color/blue_dark"
+            android:src="@drawable/ic_hourglass"
+            app:tint="@android:color/white"
+            android:contentDescription="Focus"/>
+
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="@dimen/icon_size_action"
+            android:layout_height="match_parent"
+            android:background="@color/red"
+            android:src="@drawable/ic_delete"
+            app:tint="@android:color/white"
+            android:contentDescription="Delete"/>
+    </LinearLayout>
+
+    <!-- Foreground layer with task content -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/layoutForeground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        app:cardBackgroundColor="@color/white"
+        app:cardElevation="@dimen/card_elevation"
+        app:cardCornerRadius="0dp">
 
-        <CheckBox
-            android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            android:orientation="horizontal"
+            android:padding="@dimen/task_item_padding"
+            android:background="@color/white"
+            android:minHeight="@dimen/icon_size_large">
 
-        <TextView
-            android:id="@+id/tvTaskTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Task Title"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            app:layout_constraintStart_toEndOf="@id/checkbox"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/imgClock" />
+            <CheckBox
+                android:id="@+id/checkboxTask"
+                android:layout_width="@dimen/task_checkbox_size"
+                android:layout_height="@dimen/task_checkbox_size"
+                android:layout_gravity="center_vertical" />
 
-        <TextView
-            android:id="@+id/tvCategory"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp"
-            android:text="Category"
-            android:textSize="12sp"
-            android:textColor="#757575"
-            app:layout_constraintStart_toEndOf="@id/checkbox"
-            app:layout_constraintTop_toBottomOf="@id/tvTaskTitle"
-            app:layout_constraintEnd_toStartOf="@id/imgClock" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/spacing_small">
 
-        <TextView
-            android:id="@+id/tvTaskTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="10:00"
-            android:textSize="12sp"
-            android:textColor="@color/primary"
-            app:layout_constraintEnd_toStartOf="@id/imgClock"
-            app:layout_constraintBottom_toBottomOf="@id/imgClock"
-            app:layout_constraintTop_toTopOf="@id/imgClock" />
+                <TextView
+                    android:id="@+id/textTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="Task Title" />
 
-        <ImageView
-            android:id="@+id/imgClock"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_clock"
-            app:tint="@color/primary"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                    android:id="@+id/textCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_small"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginTop="@dimen/spacing_tiny"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="Category" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnRepeat"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_repeat"
+                android:visibility="gone"
+                android:padding="@dimen/spacing_small"
+                android:contentDescription="Repeat"/>
+
+            <ImageButton
+                android:id="@+id/btnFlag"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_flag_outline"
+                android:padding="@dimen/spacing_small"
+                android:contentDescription="Flag"/>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</com.example.todolist.Ui.widget.SwipeRevealLayout>

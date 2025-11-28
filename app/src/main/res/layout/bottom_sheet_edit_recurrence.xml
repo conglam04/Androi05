@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_large"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Task Title"
+        android:textSize="@dimen/text_size_xlarge"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_marginBottom="@dimen/spacing_small"/>
+
+    <TextView
+        android:id="@+id/textInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Task này đang lặp lại"
+        android:textSize="@dimen/text_size_normal"
+        android:textColor="?android:textColorSecondary"
+        android:layout_marginBottom="@dimen/spacing_large"/>
+
+    <Button
+        android:id="@+id/btnEditRecurrence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:text="Chỉnh sửa lặp lại"
+        android:textSize="@dimen/text_size_medium"
+        android:textAllCaps="false"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+    <Button
+        android:id="@+id/btnCancelRecurrence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:text="Hủy lặp lại"
+        android:textSize="@dimen/text_size_medium"
+        android:textAllCaps="false"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        android:backgroundTint="?attr/colorError"
+        style="@style/Widget.Material3.Button"/>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:text="Đóng"
+        android:textSize="@dimen/text_size_medium"
+        android:textAllCaps="false"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+</LinearLayout>
+</ScrollView>
+

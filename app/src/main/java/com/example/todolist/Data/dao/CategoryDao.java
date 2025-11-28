@@ -1,5 +1,6 @@
 package com.example.todolist.Data.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -29,7 +30,18 @@ public interface CategoryDao {
     @Query("SELECT * FROM categories WHERE category_id = :id LIMIT 1")
     Category getCategoryById(int id);
 
-    // --- MỚI: Thêm hàm này để sửa lỗi "cannot find symbol" ---
     @Query("SELECT * FROM categories WHERE name = :name LIMIT 1")
     Category getCategoryByName(String name);
+    //
+
+    @Query("SELECT * FROM categories ORDER BY name ASC")
+    LiveData<List<Category>> getAllLiveDataCategories();
+
+    @Query("SELECT * FROM categories WHERE category_id = :categoryId")
+    LiveData<Category> getCategoryById(long categoryId);
+    @Query("SELECT COUNT(*) FROM tasks WHERE category_id = :categoryId")
+    int getTaskCountForCategory(long categoryId);
+    @Query("SELECT COUNT(*) FROM categories")
+    int getCategoryCount();
+
 }

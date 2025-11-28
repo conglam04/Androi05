@@ -20,7 +20,64 @@ public class Task {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "task_id")
     private int taskId;
+//
+    private boolean isFlagged;
+    private Long reminderDate;
+//lăp lại
+    @ColumnInfo(name = "isRecurring")
+    private boolean isRecurring = false;
 
+    @ColumnInfo(name = "recurrenceRuleId")
+    private Long recurrenceRuleId;
+
+    @ColumnInfo(name = "parentTaskId")
+    private Long parentTaskId;
+
+    public Task(String title, String description, Integer categoryId) {
+        this.title = title;
+        this.description = description;
+        this.categoryId = categoryId;
+    }
+
+    public boolean isFlagged() {
+        return isFlagged;
+    }
+
+    public void setFlagged(boolean flagged) {
+        isFlagged = flagged;
+    }
+
+    public Long getReminderDate() {
+        return reminderDate;
+    }
+
+    public void setReminderDate(Long reminderDate) {
+        this.reminderDate = reminderDate;
+    }
+
+    public boolean isRecurring() {
+        return isRecurring;
+    }
+
+    public void setRecurring(boolean recurring) {
+        isRecurring = recurring;
+    }
+
+    public Long getRecurrenceRuleId() {
+        return recurrenceRuleId;
+    }
+
+    public void setRecurrenceRuleId(Long recurrenceRuleId) {
+        this.recurrenceRuleId = recurrenceRuleId;
+    }
+
+    public Long getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(Long parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
     // Đã xóa trường String category
 
     @NonNull
@@ -46,7 +103,7 @@ public class Task {
     private int isStarred;
 
     @ColumnInfo(name = "created_at")
-    private Long createdAt;
+    private Long createdAt = System.currentTimeMillis();
 
     @ColumnInfo(name = "updated_at")
     private Long updatedAt;

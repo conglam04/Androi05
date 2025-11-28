@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Hourglass outline -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#757575"
+        android:strokeWidth="1"
+        android:pathData="M6,2h12v2.5c0,1.1-0.45,2.15-1.22,2.92L14,11l2.78,3.58C18.55,15.35 19,16.4 19,17.5V20H5v-2.5c0-1.1 0.45-2.15 1.22-2.92L10,11 7.22,7.42C6.45,6.65 6,5.6 6,4.5V2zM8,4v0.5c0,0.55 0.22,1.07 0.59,1.45L11,8l-2.41,2.05C8.22,10.93 8,11.45 8,12v0.5c0,0.55 0.22,1.07 0.59,1.45L11,16l-2.41,2.05C8.22,18.93 8,19.45 8,20V20" />
+
+    <!-- Sand top (filled) -->
+    <path
+        android:fillColor="#90A4AE"
+        android:pathData="M8.6,6.95C9.22,6.33 10.07,6 11,6s1.78,0.33 2.4,0.95L11,9.35 8.6,6.95z" />
+
+    <!-- Sand bottom (filled) -->
+    <path
+        android:fillColor="#90A4AE"
+        android:pathData="M11,15.65l2.4,3.4C12.78,19.67 11.93,20 11,20s-1.78-0.33-2.4-0.95L11,15.65z" />
+</vector>

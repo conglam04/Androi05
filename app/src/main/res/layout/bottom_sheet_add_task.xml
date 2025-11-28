@@ -1,100 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/bg_bottom_sheet"
-    android:padding="16dp">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:background="@drawable/bg_bottom_sheet"
+        android:padding="@dimen/bottom_sheet_padding">
 
-        <EditText
-            android:id="@+id/editTaskTitle"
-            android:layout_width="0dp"
+        <!-- Top row: EditText + Light bulb -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:hint="Nhập nhiệm vụ mới tại đây"
-            android:textSize="16sp"
-            android:textColorHint="#BDBDBD"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:inputType="textCapSentences|textMultiLine"
-            android:maxLines="3"
-            android:minHeight="40dp"
-            android:gravity="top" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <ImageButton
-            android:id="@+id/btnIdea"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_lightbulb"
-            app:tint="@color/orange" />
+            <!-- Task Title Input -->
+            <EditText
+                android:id="@+id/editTaskTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Nhập nhiệm vụ mới tại đây"
+                android:textSize="@dimen/text_size_medium"
+                android:textColorHint="#BDBDBD"
+                android:paddingTop="@dimen/spacing_tiny"
+                android:paddingBottom="@dimen/spacing_tiny"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="3"
+                android:minHeight="@dimen/icon_size_medium"
+                android:gravity="top" />
+
+            <!-- Light bulb icon -->
+            <ImageButton
+                android:id="@+id/btnIdea"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                android:padding="@dimen/spacing_small"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_lightbulb"
+                android:contentDescription="Ý tưởng"
+                app:tint="@color/orange" />
+
+        </LinearLayout>
+
+        <!-- Bottom row: Category label + Action icons + FAB -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Category label (clickable) -->
+            <TextView
+                android:id="@+id/textCategoryLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Không có thể loại"
+                android:textSize="@dimen/text_size_normal"
+                android:textColor="@color/text_secondary"
+                android:paddingEnd="@dimen/spacing_medium"
+                android:paddingTop="@dimen/spacing_small"
+                android:paddingBottom="@dimen/spacing_small"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Action icons in a scrollable container -->
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnSetTime"
+                        android:layout_width="@dimen/icon_size_normal"
+                        android:layout_height="@dimen/icon_size_normal"
+                        android:layout_marginEnd="@dimen/spacing_tiny"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Đặt thời gian"
+                        android:padding="@dimen/spacing_tiny"
+                        android:src="@drawable/ic_clock"
+                        app:tint="@color/icon_tint" />
+
+                    <ImageButton
+                        android:id="@+id/btnSetReminder"
+                        android:layout_width="@dimen/icon_size_normal"
+                        android:layout_height="@dimen/icon_size_normal"
+                        android:layout_marginEnd="@dimen/spacing_tiny"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Đặt nhắc nhở"
+                        android:padding="@dimen/spacing_tiny"
+                        android:src="@drawable/ic_bell"
+                        app:tint="@color/icon_tint" />
+
+                    <ImageButton
+                        android:id="@+id/btnSetRepeat"
+                        android:layout_width="@dimen/icon_size_normal"
+                        android:layout_height="@dimen/icon_size_normal"
+                        android:layout_marginEnd="@dimen/spacing_tiny"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Lặp lại"
+                        android:padding="@dimen/spacing_tiny"
+                        android:src="@drawable/ic_repeat"
+                        app:tint="@color/icon_tint" />
+
+                    <ImageButton
+                        android:id="@+id/btnAddSubtask"
+                        android:layout_width="@dimen/icon_size_normal"
+                        android:layout_height="@dimen/icon_size_normal"
+                        android:layout_marginEnd="@dimen/spacing_tiny"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Công việc con"
+                        android:padding="@dimen/spacing_tiny"
+                        android:src="@drawable/ic_subtask"
+                        app:tint="@color/icon_tint" />
+
+                    <ImageButton
+                        android:id="@+id/btnSetTag"
+                        android:layout_width="@dimen/icon_size_normal"
+                        android:layout_height="@dimen/icon_size_normal"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Thẻ tag"
+                        android:padding="@dimen/spacing_tiny"
+                        android:src="@drawable/ic_tag"
+                        app:tint="@color/icon_tint" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Save FAB Button -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnSaveTask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_small"
+                android:src="@drawable/ic_check"
+                app:backgroundTint="@color/primary"
+                app:tint="@android:color/white"
+                app:fabSize="normal"
+                app:elevation="6dp" />
+
+        </LinearLayout>
+
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:id="@+id/textCategoryLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="không có thể loại"
-            android:textSize="12sp"
-            android:textColor="@color/text_secondary"
-            android:background="@drawable/bg_chip_gray"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:layout_marginEnd="8dp"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <ImageButton
-            android:id="@+id/btnSetTime"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="4dp"
-            android:padding="6dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_clock"
-            app:tint="@color/icon_tint" />
-
-        <ImageButton
-            android:id="@+id/btnSetReminder"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="4dp"
-            android:padding="6dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_bell"
-            app:tint="@color/icon_tint" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnSaveTask"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_check"
-            app:backgroundTint="@color/primary"
-            app:tint="@android:color/white"
-            app:fabSize="mini"
-            app:elevation="2dp" />
-    </LinearLayout>
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

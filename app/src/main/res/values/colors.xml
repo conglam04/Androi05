@@ -1,25 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="teal_200">#B8E9E4</color>
-    <color name="teal_700">#018786</color>
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
-    <color name="purple_50">#D8CCE7</color>  <!-- tím pastel nhạt -->
-    <color name="background">#FFFFFF</color>
-    <color name="divider">#E0E0E0</color>
-    <color name="primary">#6200EE</color>
-    <color name="text_secondary">#757575</color>
-    <!-- Màu chủ đạo (khi chọn) -->
-    <color name="purple_500">#7C4DFF</color> <!-- tím chính -->
-
-    <!-- Màu icon/text chưa chọn -->
-    <color name="gray_700">#444444</color>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="orange">#FF9800</color>
-
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
     <color name="icon_tint">#757575</color>
+    <color name="orange">#FF9800</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_50">#E1BEE7</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
 
+
+    <!-- Primary App Colors -->
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="accent">#FF9800</color>
+    <color name="accent_light">#FFE0B2</color>
+
+    <!-- Category Colors -->
+    <color name="category_all">#2196F3</color>
+    <color name="category_work">#4CAF50</color>
+    <color name="category_personal">#FF9800</color>
+    <color name="category_favorite">#F44336</color>
+
+    <!-- Text Colors -->
     <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_disabled">#9E9E9E</color>
 
+    <!-- Background Colors -->
+    <color name="background">#FAFAFA</color>
+    <color name="background_dark">#F5F5F5</color>
     <color name="card_background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+
+    <!-- Divider & Border Colors -->
+    <color name="divider">#BDBDBD</color>
+    <color name="border">#E0E0E0</color>
+
+    <!-- Icon Colors -->
+    <color name="icon_active">#2196F3</color>
+    <color name="icon_inactive">#9E9E9E</color>
+
+    <!-- Status Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+    <color name="info">#2196F3</color>
+
+    <!-- Special Colors -->
+    <color name="red">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#2196F3</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="purple">#9C27B0</color>
+    <color name="pink">#E91E63</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="teal">#009688</color>
+
+    <!-- Light Variants for Backgrounds -->
+    <color name="orange_light">#FFE0B2</color>
+    <color name="red_light">#FFCDD2</color>
+    <color name="green_light">#C8E6C9</color>
+    <color name="blue_light">#BBDEFB</color>
+    <color name="yellow_light">#FFF9C4</color>
+    <color name="purple_light">#E1BEE7</color>
+    <color name="pink_light">#F8BBD0</color>
+    <color name="indigo_light">#C5CAE9</color>
+    <color name="cyan_light">#B2EBF2</color>
+    <color name="teal_light">#B2DFDB</color>
+
+    <!-- Dark Variants -->
+    <color name="orange_dark">#F57C00</color>
+    <color name="red_dark">#D32F2F</color>
+    <color name="green_dark">#388E3C</color>
+    <color name="blue_dark">#1976D2</color>
+    <color name="yellow_dark">#FBC02D</color>
+    <color name="purple_dark">#7B1FA2</color>
+    <color name="pink_dark">#C2185B</color>
+    <color name="indigo_dark">#303F9F</color>
+    <color name="cyan_dark">#0097A7</color>
+    <color name="teal_dark">#00796B</color>
+
+    <!-- Transparency Colors -->
+    <color name="transparent">#00000000</color>
+    <color name="semi_transparent_black">#80000000</color>
+    <color name="semi_transparent_white">#80FFFFFF</color>
+
+    <!-- Gray Scale -->
+    <color name="gray_50">#FAFAFA</color>
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_300">#E0E0E0</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_500">#9E9E9E</color>
+    <color name="gray_600">#757575</color>
+    <color name="gray_700">#616161</color>
+    <color name="gray_800">#424242</color>
+    <color name="gray_900">#212121</color>
+
+    <!-- Badge Colors -->
+    <color name="badge_blue">#E3F2FD</color>
+    <color name="badge_green">#E8F5E9</color>
+    <color name="badge_orange">#FFF3E0</color>
+    <color name="badge_red">#FFEBEE</color>
+    <color name="badge_purple">#F3E5F5</color>
+
+    <!-- Bottom Sheet -->
+    <color name="bottom_sheet_background">#FFFFFF</color>
+    <color name="bottom_sheet_scrim">#52000000</color>
+
+    <!-- Task Status Colors -->
+    <color name="task_completed">#4CAF50</color>
+    <color name="task_pending">#FF9800</color>
+    <color name="task_overdue">#F44336</color>
+    <color name="task_flagged">#F44336</color>
+
+    <!-- Ripple Effect -->
+    <color name="ripple_light">#1F000000</color>
+    <color name="ripple_dark">#33FFFFFF</color>
+
+    <!-- Shadow Colors -->
+    <color name="shadow_light">#1A000000</color>
+    <color name="shadow_medium">#33000000</color>
+    <color name="shadow_dark">#4D000000</color>
+
+    <!-- Overlay Colors -->
+    <color name="overlay_light">#0D000000</color>
+    <color name="overlay_medium">#1A000000</color>
+    <color name="overlay_dark">#33000000</color>
 </resources>

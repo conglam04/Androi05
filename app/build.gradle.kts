@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.todolist"
-    compileSdk = 36 // 36 hiện chưa chính thức, nên dùng 34 (hoặc 35 nếu SDK preview đã cài)
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.todolist"
@@ -27,6 +27,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -56,8 +57,12 @@ dependencies {
 
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.0")
-
+    // LocalBroadcastManager for focus timer updates
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
     // Test
+    implementation("androidx.work:work-runtime:2.8.1")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
+    //
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

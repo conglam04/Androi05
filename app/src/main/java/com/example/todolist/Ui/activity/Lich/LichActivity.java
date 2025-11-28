@@ -51,7 +51,7 @@ public class LichActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lich);
-        setupBottomNav(R.id.nav_calendar);
+        setupBottomNav(R.id.navigation_calendar);
 
         // Xin quyền thông báo (Android 13+)
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {

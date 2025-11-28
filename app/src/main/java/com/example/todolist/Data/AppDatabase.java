@@ -9,15 +9,18 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.todolist.Data.dao.CategoryDao;
+import com.example.todolist.Data.dao.RecurrenceRuleDao;
 import com.example.todolist.Data.dao.TaskDao;
 import com.example.todolist.Data.dao.UserDao;
 import com.example.todolist.Data.entity.Category;
+import com.example.todolist.Data.entity.RecurrenceRule;
 import com.example.todolist.Data.entity.Task;
 import com.example.todolist.Data.entity.User;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Task.class, Category.class, User.class}, version = 2, exportSchema = false)
+@Database(entities = {Task.class, Category.class, User.class, RecurrenceRule.class}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -25,6 +28,10 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
     public abstract CategoryDao categoryDao();
     public abstract UserDao userDao();
+    public abstract RecurrenceRuleDao recurrenceRuleDao();
+    private static final int NUMBER_OF_THREADS = 4;
+    public static final ExecutorService databaseWriteExecutor =
+            Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {

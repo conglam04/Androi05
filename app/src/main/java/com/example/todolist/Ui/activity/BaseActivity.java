@@ -39,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            if (id == R.id.nav_tasks) {
+            if (id == R.id.navigation_tasks) {
                 if (!(this instanceof MainActivity)) {
                     startActivity(new Intent(this, MainActivity.class));
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -47,7 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
                 return true;
 
-            } else if (id == R.id.nav_calendar) {
+            } else if (id == R.id.navigation_calendar) {
                 if (!(this instanceof LichActivity)) {
                     startActivity(new Intent(this, LichActivity.class));
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -55,7 +55,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
                 return true;
 
-            } else if (id == R.id.nav_profile) {
+            } else if (id == R.id.navigation_profile) {
                 if (!(this instanceof ThongKeActivity)) {
                     startActivity(new Intent(this, ThongKeActivity.class));
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
