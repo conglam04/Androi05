@@ -55,6 +55,8 @@ public interface UserDao {
 
     @Query("SELECT * FROM users ORDER BY user_id DESC")
     List<User> getAllUsers();
+    @Query("SELECT * FROM users WHERE sdt = :phoneNumber LIMIT 1")
+    User findUserByPhoneNumber(String phoneNumber);
 
 
 

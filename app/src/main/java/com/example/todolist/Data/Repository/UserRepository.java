@@ -42,4 +42,10 @@ public class UserRepository {
         // Ví dụ: AppDatabase.databaseWriteExecutor.execute(() -> { userDao.insertUser(user); });
         userDao.insertUser(user);
     }
+    public User findUserByPhoneNumber(String phone) {
+        return userDao.findUserByPhoneNumber(phone);
+    }
+    public void updateUser(User user) {
+        userDao.updateUser(user);
+    }
 }

@@ -2,6 +2,8 @@ package com.example.todolist.Ui.activity.Login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;import android.widget.TextView;
 import android.widget.Toast;
@@ -19,9 +21,11 @@ import com.example.todolist.utils.SecurityUtils;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private EditText etUsername, etPassword, etConfirmPassword;
+    private EditText etUsername, etPassword, etConfirmPassword, etSdt, etEmail;
     private Button btnSignup;
     private TextView tvLinkToLogin;
+    private String serverOtp = null;
+
 
     private UserRepository userRepository; // <-- Khai báo UserRepository
 
@@ -41,6 +45,8 @@ public class SignupActivity extends AppCompatActivity {
     // ... (các hàm initViews, setupWindowInsets, setupEventListeners giữ nguyên không đổi) ...
     private void initViews() {
         etUsername = findViewById(R.id.et_username_signup);
+        etSdt=findViewById(R.id.et_phone_signup);
+        etEmail=findViewById(R.id.et_email_signup);
         etPassword = findViewById(R.id.et_password_signup);
         etConfirmPassword = findViewById(R.id.et_confirm_password_signup);
         btnSignup = findViewById(R.id.btn_signup);
@@ -63,10 +69,12 @@ public class SignupActivity extends AppCompatActivity {
 
     private void handleSignup() {
         String username = etUsername.getText().toString().trim();
+        String sdt=etSdt.getText().toString().trim();
+        String email=etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        if (!isInputValid(username, password, confirmPassword)) {
+        if (!isInputValid(username, password, confirmPassword,sdt,email)) {
             return;
         }
 
@@ -76,20 +84,12 @@ public class SignupActivity extends AppCompatActivity {
             return;
         }
 
-        // Sử dụng repository để tạo người dùng
-        createUserAndSave(username, password);
-
-        Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
-        getSharedPreferences("USER_DATA", MODE_PRIVATE)
-                .edit()
-                .putString("USERNAME", username)
-                .apply();
-        navigateToMain(username);
+        showOTPDialog(username,sdt,email,password);
     }
 
-    private boolean isInputValid(String username, String password, String confirmPassword) {
+    private boolean isInputValid(String username, String password, String confirmPassword,String sdt,String email) {
         // Logic này không thay đổi
-        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()||sdt.isEmpty() || email.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -101,6 +101,15 @@ public class SignupActivity extends AppCompatActivity {
             Toast.makeText(this, "Mật khẩu xác nhận không khớp.", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (!isValidEmail(email)) {
+            Toast.makeText(this, "Email không hợp lệ hoặc bị bỏ trống!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (!isValidPhoneNumber(sdt)) {
+            Toast.makeText(this, "Số điện thoại phải 10 chữ số và bắt đầu bằng 0.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         return true;
     }
 
@@ -110,7 +119,7 @@ public class SignupActivity extends AppCompatActivity {
         return existingUser != null;
     }
 
-    private void createUserAndSave(String username, String password) {
+    private void createUserAndSave(String username, String password,String sdt,String email) {
         String hashedPassword = SecurityUtils.hashPassword(password);
         if (hashedPassword == null) {
             Toast.makeText(this, "Lỗi hệ thống, vui lòng thử lại.", Toast.LENGTH_SHORT).show();
@@ -120,6 +129,8 @@ public class SignupActivity extends AppCompatActivity {
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setPassword(hashedPassword);
+        newUser.setSdt(sdt);
+        newUser.setEmail(email);
 
         // Thay đổi ở đây: Gọi đến repository thay vì DB trực tiếp
         userRepository.insertUser(newUser);
@@ -137,5 +148,89 @@ public class SignupActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+    public boolean isValidPhoneNumber(String phone) {
+        if (phone == null || phone.isEmpty()) {
+            return false;
+        }
+
+        // Regex cơ bản: Bắt đầu bằng 0, theo sau là 9 chữ số (tổng cộng 10 số)
+        // Ví dụ: 0901234567
+        String phoneRegex = "^0[0-9]{9}$";
+
+        return phone.matches(phoneRegex);
+    }
+    public boolean isValidEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            return false;
+        }
+        // Sử dụng Patterns.EMAIL_ADDRESS để kiểm tra Regex chuẩn
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+    private String generateRandomOTP() {
+        int randomPin = (int) (Math.random() * 900000) + 100000;
+        return String.valueOf(randomPin);
+    }
+    private void showOTPDialog(String username,String phoneNumber, String email, String password) {
+        // 1. Tạo Dialog từ Layout XML
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_verify_otp, null);
+        builder.setView(dialogView);
+        android.app.AlertDialog dialog = builder.create();
+
+        // 2. Ánh xạ các view trong Dialog
+        TextView tvPhoneDisplay = dialogView.findViewById(R.id.tv_phone_display);
+        EditText etOtpInput = dialogView.findViewById(R.id.et_otp_input);
+        Button btnSendOtp = dialogView.findViewById(R.id.btn_send_otp);
+        Button btnConfirmOtp = dialogView.findViewById(R.id.btn_confirm_otp);
+
+        tvPhoneDisplay.setText("Xác thực SĐT: " + phoneNumber);
+
+        // 3. Xử lý sự kiện nút "Lấy mã xác thực"
+        btnSendOtp.setOnClickListener(v -> {
+            // Tạo mã ngẫu nhiên
+            serverOtp = generateRandomOTP();
+
+            // --- GIẢ LẬP GỬI TIN NHẮN ---
+            // Trong thực tế, bạn sẽ gọi API gửi SMS ở đây.
+            // Ở đây mình dùng Toast để hiện mã lên màn hình cho bạn test.
+            Toast.makeText(this, "Mã OTP của bạn là: " + serverOtp, Toast.LENGTH_LONG).show();
+
+            // (Tùy chọn) Đổi text nút để báo đã gửi
+            btnSendOtp.setText("Gửi lại mã");
+        });
+
+        // 4. Xử lý sự kiện nút "Xác nhận"
+        btnConfirmOtp.setOnClickListener(v -> {
+            String userEnteredOtp = etOtpInput.getText().toString().trim();
+
+            if (serverOtp == null) {
+                Toast.makeText(this, "Vui lòng nhấn Gửi mã trước!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (userEnteredOtp.isEmpty()) {
+                etOtpInput.setError("Vui lòng nhập mã!");
+                return;
+            }
+
+            // SO SÁNH MÃ
+            if (userEnteredOtp.equals(serverOtp)) {
+                Toast.makeText(this, "Xác thực thành công!", Toast.LENGTH_SHORT).show();
+                dialog.dismiss(); // Đóng dialog
+                createUserAndSave(username, password, phoneNumber, email); // phoneNumber chính là sdt
+
+                Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
+                getSharedPreferences("USER_DATA", MODE_PRIVATE)
+                        .edit()
+                        .putString("USERNAME", username)
+                        .apply();
+                navigateToMain(username);
+            } else {
+                Toast.makeText(this, "Mã OTP không đúng, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
     }
 }

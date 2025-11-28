@@ -31,7 +31,8 @@ public abstract class AppDatabase extends RoomDatabase {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "todo_database")
                     .fallbackToDestructiveMigration() // Cho phép xóa DB cũ xây lại mới
-                    .addCallback(roomCallback) // Thêm callback để tạo dữ liệu mẫu
+                    .addCallback(roomCallback)
+                    .allowMainThreadQueries()
                     .build();
         }
         return INSTANCE;

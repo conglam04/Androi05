@@ -8,8 +8,7 @@
     android:padding="32dp"
     android:gravity="center"
     android:background="#F8F9FA"
-    android:id="@+id/signup"
-    tools:context=".Ui.activity.Login.SignupActivity">
+    android:id="@+id/signup">
 
     <!-- Tiêu đề ứng dụng -->
     <TextView
@@ -29,6 +28,28 @@
         android:layout_height="wrap_content"
         android:hint="Tên đăng nhập"
         android:inputType="text"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_edittext"
+        tools:ignore="Autofill" />
+    <EditText
+        android:id="@+id/et_email_signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_edittext"
+        tools:ignore="Autofill" />
+
+    <!-- EditText cho Số điện thoại (Mới thêm) -->
+    <EditText
+        android:id="@+id/et_phone_signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số điện thoại"
+        android:inputType="phone"
         android:padding="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_edittext"

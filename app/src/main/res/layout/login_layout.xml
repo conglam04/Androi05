@@ -68,6 +68,16 @@
         android:clickable="true"
         android:focusable="true"
         android:padding="8dp" />
+    <TextView
+        android:id="@+id/tv_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quên mật khẩu?"
+        android:textColor="#6c757d"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:layout_marginTop="8dp" />
 
     <!-- Lưu ý: Để có rounded corners cho EditText, bạn cần tạo file XML drawable/rounded_edittext.xml -->
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tạo mật khẩu mới"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:id="@+id/et_new_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mật khẩu"
+        android:inputType="textPassword"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_edittext" />
+
+    <!-- Trường nhập Xác nhận Mật khẩu -->
+    <EditText
+        android:id="@+id/et_confirm_new_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Xác nhận Mật khẩu"
+        android:inputType="textPassword"
+        android:padding="16dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/rounded_edittext" />
+
+    <Button
+        android:id="@+id/btn_confirm_new_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xác nhận"
+        android:backgroundTint="#4CAF50"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>
