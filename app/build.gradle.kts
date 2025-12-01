@@ -61,6 +61,8 @@ dependencies {
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
     // Test
     implementation("androidx.work:work-runtime:2.8.1")
+    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.3.1")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
     //
     testImplementation(libs.junit)

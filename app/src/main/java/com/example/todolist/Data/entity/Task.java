@@ -32,7 +32,7 @@ public class Task {
 
     @ColumnInfo(name = "parentTaskId")
     private Long parentTaskId;
-
+    @Ignore
     public Task(String title, String description, Integer categoryId) {
         this.title = title;
         this.description = description;

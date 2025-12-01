@@ -2,11 +2,11 @@ package com.example.todolist.Ui.activity.Login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -15,7 +15,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.todolist.Data.entity.User;
 import com.example.todolist.R;
-import com.example.todolist.Repository.UserRepository;
+// --- SỬA ĐÚNG IMPORT TẠI ĐÂY ---
+import com.example.todolist.Data.Repository.UserRepository;
 import com.example.todolist.Ui.activity.MainActivity;
 import com.example.todolist.utils.SecurityUtils;
 
@@ -81,10 +82,14 @@ public class LoginActivity extends AppCompatActivity {
         String hashedPassword = SecurityUtils.hashPassword(password);
         if (userFromDb.getPassword().equals(hashedPassword)) {
             Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+
+            // Lưu ID user
             getSharedPreferences("USER_DATA", MODE_PRIVATE)
                     .edit()
                     .putString("USERNAME", username)
+                    .putInt("USER_ID", userFromDb.getUserId())
                     .apply();
+
             navigateToMain(userFromDb.getUsername());
         } else {
             Toast.makeText(this, "Tên đăng nhập hoặc mật khẩu không đúng.", Toast.LENGTH_SHORT).show();
@@ -108,8 +113,12 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
             User userFromDb = findUserByPhoneNumber(phoneNumber);
-            dialog.dismiss();
-            showOTPDialog(userFromDb.getUsername(),phoneNumber);
+            if (userFromDb != null) {
+                dialog.dismiss();
+                showOTPDialog(userFromDb.getUsername(), phoneNumber);
+            } else {
+                Toast.makeText(this, "Số điện thoại không tồn tại.", Toast.LENGTH_SHORT).show();
+            }
         });
         dialog.show();
     }
@@ -125,18 +134,18 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SignupActivity.class);
         startActivity(intent);
     }
+
     private String generateRandomOTP() {
         int randomPin = (int) (Math.random() * 900000) + 100000;
         return String.valueOf(randomPin);
     }
-    private void showOTPDialog(String username ,String phoneNumber) {
-        // 1. Tạo Dialog từ Layout XML
+
+    private void showOTPDialog(String username, String phoneNumber) {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_verify_otp, null);
         builder.setView(dialogView);
         android.app.AlertDialog dialog = builder.create();
 
-        // 2. Ánh xạ các view trong Dialog
         TextView tvPhoneDisplay = dialogView.findViewById(R.id.tv_phone_display);
         EditText etOtpInput = dialogView.findViewById(R.id.et_otp_input);
         Button btnSendOtp = dialogView.findViewById(R.id.btn_send_otp);
@@ -144,47 +153,33 @@ public class LoginActivity extends AppCompatActivity {
 
         tvPhoneDisplay.setText("Xác thực SĐT: " + phoneNumber);
 
-        // 3. Xử lý sự kiện nút "Lấy mã xác thực"
         btnSendOtp.setOnClickListener(v -> {
-            // Tạo mã ngẫu nhiên
             serverOtp = generateRandomOTP();
-
-            // --- GIẢ LẬP GỬI TIN NHẮN ---
-            // Trong thực tế, bạn sẽ gọi API gửi SMS ở đây.
-            // Ở đây mình dùng Toast để hiện mã lên màn hình cho bạn test.
             Toast.makeText(this, "Mã OTP của bạn là: " + serverOtp, Toast.LENGTH_LONG).show();
-
-            // (Tùy chọn) Đổi text nút để báo đã gửi
             btnSendOtp.setText("Gửi lại mã");
         });
 
-        // 4. Xử lý sự kiện nút "Xác nhận"
         btnConfirmOtp.setOnClickListener(v -> {
             String userEnteredOtp = etOtpInput.getText().toString().trim();
-
             if (serverOtp == null) {
                 Toast.makeText(this, "Vui lòng nhấn Gửi mã trước!", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (userEnteredOtp.isEmpty()) {
                 etOtpInput.setError("Vui lòng nhập mã!");
                 return;
             }
-
-            // SO SÁNH MÃ
             if (userEnteredOtp.equals(serverOtp)) {
                 Toast.makeText(this, "Xác thực thành công!", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
-                setNewPassword(username,phoneNumber);
-
+                setNewPassword(username, phoneNumber);
             } else {
                 Toast.makeText(this, "Mã OTP không đúng, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
             }
         });
-
         dialog.show();
     }
+
     private void setNewPassword(String username, String phoneNumber) {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.set_pass, null);
@@ -192,39 +187,35 @@ public class LoginActivity extends AppCompatActivity {
         android.app.AlertDialog dialog = builder.create();
 
         EditText etNewPassword = dialogView.findViewById(R.id.et_new_password);
-        EditText etConfirmNewPass= dialogView.findViewById(R.id.et_confirm_new_password);
+        EditText etConfirmNewPass = dialogView.findViewById(R.id.et_confirm_new_password);
         Button btnConfirmNewPass = dialogView.findViewById(R.id.btn_confirm_new_password);
-
 
         btnConfirmNewPass.setOnClickListener(v -> {
             String password = etNewPassword.getText().toString().trim();
             String confirmPassword = etConfirmNewPass.getText().toString().trim();
             if (password.length() < 6) {
                 Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự.", Toast.LENGTH_SHORT).show();
-                return ;
+                return;
             }
             if (!password.equals(confirmPassword)) {
                 Toast.makeText(this, "Mật khẩu xác nhận không khớp.", Toast.LENGTH_SHORT).show();
-                return ;
+                return;
             }
             updateUser(username, password);
-            Toast.makeText(this, "Đổi nật khẩu thành công!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
-
         });
         dialog.show();
-
     }
-    private void updateUser(String username, String password){
+
+    private void updateUser(String username, String password) {
         String hashedPassword = SecurityUtils.hashPassword(password);
-        if (hashedPassword == null) {
-            Toast.makeText(this, "Lỗi hệ thống, vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (hashedPassword == null) return;
         User userFromDb = userRepository.findUserByUsername(username);
         userFromDb.setPassword(hashedPassword);
         userRepository.updateUser(userFromDb);
     }
+
     private User findUserByPhoneNumber(String phoneNumber) {
         User userFromDb = userRepository.findUserByPhoneNumber(phoneNumber);
         if (userFromDb == null) {

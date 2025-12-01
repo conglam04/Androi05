@@ -50,7 +50,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
     private Long selectedTime = null;
     private Long selectedReminder = null;
     private String selectedRepeat = "Không";
-    private String selectedCategoryName = "Khác"; // Lưu tạm tên category user chọn
+    private String selectedCategoryName = "Khác";
 
     private String fallbackDate;
     private boolean dateTimePickerWasUsed = false;
@@ -122,11 +122,22 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void showReminderPicker() {
-        Calendar now = Calendar.getInstance();
+        Calendar baseDateCal = Calendar.getInstance();
+
+        if (selectedDueDate != null) {
+            baseDateCal.setTimeInMillis(selectedDueDate);
+        } else if (fallbackDate != null) {
+            try {
+                long fallbackMillis = Long.parseLong(fallbackDate);
+                baseDateCal.setTimeInMillis(fallbackMillis);
+            } catch (NumberFormatException e) {
+            }
+        }
+
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour(now.get(Calendar.HOUR_OF_DAY))
-                .setMinute(now.get(Calendar.MINUTE))
+                .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
                 .setTitleText("Đặt giờ nhắc nhở")
                 .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
                 .build();
@@ -134,21 +145,22 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
         picker.addOnPositiveButtonClickListener(v -> {
             int h = picker.getHour();
             int m = picker.getMinute();
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, h);
-            cal.set(Calendar.MINUTE, m);
-            cal.set(Calendar.SECOND, 0);
 
-            if (cal.getTimeInMillis() < System.currentTimeMillis()) {
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-            }
+            Calendar reminderCal = (Calendar) baseDateCal.clone();
+            reminderCal.set(Calendar.HOUR_OF_DAY, h);
+            reminderCal.set(Calendar.MINUTE, m);
+            reminderCal.set(Calendar.SECOND, 0);
+            reminderCal.set(Calendar.MILLISECOND, 0);
 
-            this.selectedReminder = cal.getTimeInMillis();
+            this.selectedReminder = reminderCal.getTimeInMillis();
 
             if (btnSetReminder != null) {
                 btnSetReminder.setColorFilter(requireContext().getColor(R.color.primary));
             }
-            Toast.makeText(requireContext(), String.format(Locale.getDefault(), "Sẽ nhắc lúc %02d:%02d", h, m), Toast.LENGTH_SHORT).show();
+
+            String debugDate = String.format(Locale.getDefault(), "%02d:%02d %d/%d",
+                    h, m, reminderCal.get(Calendar.DAY_OF_MONTH), reminderCal.get(Calendar.MONTH) + 1);
+            Toast.makeText(requireContext(), "Nhắc nhở: " + debugDate, Toast.LENGTH_SHORT).show();
         });
         picker.show(getParentFragmentManager(), "ReminderPicker");
     }
@@ -156,7 +168,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
     private void showCategoryPicker() {
         CategoryBottomSheet picker = new CategoryBottomSheet();
         picker.setCategorySelectedListener(category -> {
-            this.selectedCategoryName = category; // Lưu tên để hiển thị
+            this.selectedCategoryName = category;
             if (textCategoryLabel != null) {
                 textCategoryLabel.setText(category);
             }
@@ -172,9 +184,21 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
         java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         java.text.DateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm", Locale.getDefault());
 
+        long displayDateMillis = -1;
+
         if (selectedDueDate != null) {
-            strDate = dateFormat.format(new java.util.Date(selectedDueDate));
+            displayDateMillis = selectedDueDate;
+        } else if (fallbackDate != null) {
+            try {
+                displayDateMillis = Long.parseLong(fallbackDate);
+            } catch (NumberFormatException e) {
+            }
         }
+
+        if (displayDateMillis != -1) {
+            strDate = dateFormat.format(new java.util.Date(displayDateMillis));
+        }
+
         if (selectedTime != null) {
             strTime = timeFormat.format(new java.util.Date(selectedTime));
         }
@@ -223,6 +247,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
 
         Long finalDueDate = null;
 
+        // 1. Tính toán ngày hạn
         Calendar cal = Calendar.getInstance();
         if (dateTimePickerWasUsed && selectedDueDate != null) {
             cal.setTimeInMillis(selectedDueDate);
@@ -236,13 +261,13 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
             }
         }
 
-        // Reset giờ
+        // Reset giờ về 00:00 mặc định
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        // Set giờ nếu có
+        // 2. Ghép giờ nếu người dùng đã chọn Giờ (selectedTime != null)
         if (dateTimePickerWasUsed && selectedTime != null) {
             Calendar timeCal = Calendar.getInstance();
             timeCal.setTimeInMillis(selectedTime);
@@ -253,17 +278,48 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
         finalDueDate = cal.getTimeInMillis();
 
         Task newTask = new Task(title, "", finalDueDate);
-        newTask.setReminderTime(selectedReminder);
+
+        // 3. Xử lý nhắc nhở (Ghép vào ngày của Task)
+        Long finalReminderTime = null;
+        if (selectedReminder != null) {
+            Calendar reminderTimeCal = Calendar.getInstance();
+            reminderTimeCal.setTimeInMillis(selectedReminder);
+            int remHour = reminderTimeCal.get(Calendar.HOUR_OF_DAY);
+            int remMinute = reminderTimeCal.get(Calendar.MINUTE);
+
+            Calendar finalReminderCal = Calendar.getInstance();
+            finalReminderCal.setTimeInMillis(finalDueDate); // Lấy ngày/tháng/năm của Task
+
+            finalReminderCal.set(Calendar.HOUR_OF_DAY, remHour);
+            finalReminderCal.set(Calendar.MINUTE, remMinute);
+            finalReminderCal.set(Calendar.SECOND, 0);
+            finalReminderCal.set(Calendar.MILLISECOND, 0);
+
+            finalReminderTime = finalReminderCal.getTimeInMillis();
+            newTask.setReminderTime(finalReminderTime);
+        } else {
+            newTask.setReminderTime(null);
+        }
+
+        // --- 4. KIỂM TRA HỢP LỆ (VALIDATION) ---
+        // Nếu có đặt Giờ cho Task (selectedTime != null) VÀ có đặt Nhắc nhở
+        if (dateTimePickerWasUsed && selectedTime != null && finalReminderTime != null) {
+            if (finalReminderTime > finalDueDate) {
+                // Nếu giờ nhắc nhở > giờ hạn
+                Toast.makeText(requireContext(), "Giờ nhắc nhở phải trước hoặc bằng giờ nhiệm vụ!", Toast.LENGTH_SHORT).show();
+                return; // Dừng lại, không lưu
+            }
+        }
+        // ---------------------------------------
+
         newTask.setRepeatRule(selectedRepeat);
 
-        // --- QUAN TRỌNG: XỬ LÝ CATEGORY ID TRONG BACKGROUND THREAD ---
+        // 5. Lưu vào Database
         new Thread(() -> {
             try {
-                // 1. Lấy ID của Category dựa trên tên đã chọn (selectedCategoryName)
                 int catId = taskRepository.getCategoryIdByName(selectedCategoryName);
-                newTask.setCategoryId(catId); // Gán ID vào Task
+                newTask.setCategoryId(catId);
 
-                // 2. Lưu Task
                 long id = taskRepository.insert(newTask);
                 newTask.setTaskId((int) id);
 

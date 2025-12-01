@@ -4,4 +4,10 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+    <style name="CustomCalendarTheme" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="colorAccent">@color/primary</item>
+
+        <item name="android:textColorPrimary">@color/blue</item>
+        <item name="android:textColorSecondary">#81CDEF</item>
+    </style>
 </resources>

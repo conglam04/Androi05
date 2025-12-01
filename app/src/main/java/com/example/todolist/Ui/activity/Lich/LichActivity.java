@@ -1,12 +1,13 @@
 package com.example.todolist.Ui.activity.Lich;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.CalendarView;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -17,32 +18,38 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.todolist.Data.Repository.TaskRepository;
 import com.example.todolist.Data.entity.Task;
 import com.example.todolist.R;
 import com.example.todolist.Ui.activity.BaseActivity;
 import com.example.todolist.Ui.adapter.TaskAdapter;
+import com.example.todolist.Ui.widget.EventDecorator;
 import com.example.todolist.ViewModel.LichViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class LichActivity extends BaseActivity implements
         AddTaskBottomSheet.OnTaskAddedListener,
         TaskAdapter.OnTaskClickListener {
 
-    private CalendarView calendarView;
+    private MaterialCalendarView calendarView;
     private RecyclerView recyclerView;
     private TaskAdapter adapter;
     private LichViewModel viewModel;
     private long selectedDateMillis;
+    private TaskRepository taskRepository;
 
-    // Format hiển thị
     private final SimpleDateFormat displayDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     private final SimpleDateFormat displayTimeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private final SimpleDateFormat debugDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 
     private Task taskToEdit = null;
     private ActivityResultLauncher<String> requestPermissionLauncher;
@@ -53,18 +60,30 @@ public class LichActivity extends BaseActivity implements
         setContentView(R.layout.activity_lich);
         setupBottomNav(R.id.navigation_calendar);
 
-        // Xin quyền thông báo (Android 13+)
+        taskRepository = new TaskRepository(getApplication());
+
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-            if (!isGranted) Toast.makeText(this, "Bạn sẽ không nhận được thông báo!", Toast.LENGTH_SHORT).show();
+            if (!isGranted)
+                Toast.makeText(this, "Bạn sẽ không nhận được thông báo!", Toast.LENGTH_SHORT).show();
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                android.app.AlarmManager alarmManager = (android.app.AlarmManager) getSystemService(ALARM_SERVICE);
+                if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    startActivity(intent);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         requestNotificationPermission();
 
-        // Init ViewModel
         viewModel = new ViewModelProvider(this).get(LichViewModel.class);
-
-        // Observe dữ liệu
         viewModel.getTasksLiveData().observe(this, tasks -> {
             adapter.updateTasks(tasks);
+            updateCalendarDots();
         });
 
         calendarView = findViewById(R.id.calendarView);
@@ -75,13 +94,17 @@ public class LichActivity extends BaseActivity implements
         adapter = new TaskAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
-        // Mặc định chọn hôm nay
-        Calendar today = Calendar.getInstance();
-        selectedDateMillis = today.getTimeInMillis();
+        Calendar instance = Calendar.getInstance();
+        calendarView.setSelectedDate(CalendarDay.from(
+                instance.get(Calendar.YEAR),
+                instance.get(Calendar.MONTH) + 1,
+                instance.get(Calendar.DAY_OF_MONTH)
+        ));
+        selectedDateMillis = instance.getTimeInMillis();
 
-        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+        calendarView.setOnDateChangedListener((widget, date, selected) -> {
             Calendar cal = Calendar.getInstance();
-            cal.set(year, month, dayOfMonth);
+            cal.set(date.getYear(), date.getMonth() - 1, date.getDay());
             selectedDateMillis = cal.getTimeInMillis();
             viewModel.loadTasksOnDate(selectedDateMillis);
         });
@@ -92,8 +115,34 @@ public class LichActivity extends BaseActivity implements
             bottomSheet.show(getSupportFragmentManager(), "AddTaskBottomSheet");
         });
 
-        // Load lần đầu
         viewModel.loadTasksOnDate(selectedDateMillis);
+        updateCalendarDots();
+    }
+
+    private void updateCalendarDots() {
+        new Thread(() -> {
+            try {
+                List<Long> millisList = taskRepository.getAllTaskDates();
+                List<CalendarDay> dates = new ArrayList<>();
+                if (millisList != null) {
+                    for (Long millis : millisList) {
+                        if (millis != null) {
+                            Calendar c = Calendar.getInstance();
+                            c.setTimeInMillis(millis);
+                            dates.add(CalendarDay.from(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+                        }
+                    }
+                }
+                runOnUiThread(() -> {
+                    if (calendarView != null) {
+                        calendarView.removeDecorators();
+                        calendarView.addDecorator(new EventDecorator(getColor(R.color.primary), dates));
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void requestNotificationPermission() {
@@ -106,16 +155,33 @@ public class LichActivity extends BaseActivity implements
 
     @Override
     public void onTaskAdded() {
-        // Delay refresh để chờ DB lưu xong
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             viewModel.refresh(selectedDateMillis);
+            updateCalendarDots();
             Toast.makeText(this, "Đã thêm nhiệm vụ", Toast.LENGTH_SHORT).show();
         }, 300);
     }
 
+    // --- SỬA: XỬ LÝ KHI TÍCH CHECKBOX ---
     @Override
     public void onTaskStatusChanged(Task task) {
+        // 1. Cập nhật trạng thái vào DB
         viewModel.updateTask(task);
+
+        // 2. Xử lý Báo thức
+        if (task.getIsCompleted() == 1) {
+            // Nếu hoàn thành -> HỦY báo thức
+            AlarmScheduler.cancelReminder(this, task);
+            Toast.makeText(this, "Đã xong! Đã tắt nhắc nhở", Toast.LENGTH_SHORT).show();
+        } else {
+            // Nếu bỏ tích -> BẬT LẠI báo thức (nếu chưa quá hạn)
+            if (task.getReminderTime() != null && task.getReminderTime() > System.currentTimeMillis()) {
+                AlarmScheduler.scheduleReminder(this, task);
+                Toast.makeText(this, "Đã kích hoạt lại nhắc nhở", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        new Handler(Looper.getMainLooper()).postDelayed(this::updateCalendarDots, 200);
     }
 
     @Override
@@ -123,78 +189,117 @@ public class LichActivity extends BaseActivity implements
         this.taskToEdit = task;
         String displayDate = "";
         String displayTime = "";
-        String displayReminder = null; // Biến String để chứa giờ nhắc
+        String displayReminder = null;
 
-        // 1. Format Ngày Hạn (Due Date)
         if (task.getDueDate() != null && task.getDueDate() > 0) {
             Date d = new Date(task.getDueDate());
             displayDate = displayDateFormat.format(d);
             displayTime = displayTimeFormat.format(d);
         }
 
-        // 2. SỬA LỖI Ở ĐÂY: Chuyển Long -> String cho ReminderTime
         if (task.getReminderTime() != null && task.getReminderTime() > 0) {
             Date r = new Date(task.getReminderTime());
-            displayReminder = displayTimeFormat.format(r); // Ví dụ: "14:30"
+            displayReminder = displayTimeFormat.format(r);
         }
 
-        // Mở Dialog chỉnh sửa với các tham số String
         DateTimePickerBottomSheet picker = DateTimePickerBottomSheet.newInstance(
-                displayDate,
-                displayTime,
-                displayReminder, // Truyền chuỗi String đã format
-                task.getRepeatRule() // Truyền quy tắc lặp lại
+                displayDate, displayTime, displayReminder, task.getRepeatRule()
         );
 
         picker.setOnDateTimeSelectedListener((dateMillis, timeMillis, reminderMillis, repeatRule) -> {
-            if (taskToEdit == null) return;
+            try {
+                if (taskToEdit == null) return;
 
-            // Cập nhật Due Date
-            if (dateMillis != null) {
-                Calendar finalCal = Calendar.getInstance();
-                finalCal.setTimeInMillis(dateMillis);
-                if (timeMillis != null) {
-                    Calendar timeCal = Calendar.getInstance();
-                    timeCal.setTimeInMillis(timeMillis);
-                    finalCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
-                    finalCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
-                    finalCal.set(Calendar.SECOND, 0);
-                    finalCal.set(Calendar.MILLISECOND, 0);
+                // Update Due Date
+                long finalDueDate = 0;
+                if (dateMillis != null) {
+                    Calendar finalCal = Calendar.getInstance();
+                    finalCal.setTimeInMillis(dateMillis);
+                    if (timeMillis != null) {
+                        Calendar timeCal = Calendar.getInstance();
+                        timeCal.setTimeInMillis(timeMillis);
+                        finalCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+                        finalCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+                        finalCal.set(Calendar.SECOND, 0);
+                    } else {
+                        finalCal.set(Calendar.HOUR_OF_DAY, 0);
+                        finalCal.set(Calendar.MINUTE, 0);
+                    }
+                    finalDueDate = finalCal.getTimeInMillis();
+                    taskToEdit.setDueDate(finalDueDate);
+                } else {
+                    taskToEdit.setDueDate(null);
                 }
-                taskToEdit.setDueDate(finalCal.getTimeInMillis());
-            } else {
-                taskToEdit.setDueDate(null);
+
+                // Update Reminder (Logic đồng bộ ngày)
+                if (reminderMillis != null) {
+                    Calendar timePickerCal = Calendar.getInstance();
+                    timePickerCal.setTimeInMillis(reminderMillis);
+                    int hour = timePickerCal.get(Calendar.HOUR_OF_DAY);
+                    int minute = timePickerCal.get(Calendar.MINUTE);
+
+                    Calendar finalReminderCal = Calendar.getInstance();
+                    if (taskToEdit.getDueDate() != null) {
+                        Calendar dueCal = Calendar.getInstance();
+                        dueCal.setTimeInMillis(taskToEdit.getDueDate());
+                        finalReminderCal.set(Calendar.YEAR, dueCal.get(Calendar.YEAR));
+                        finalReminderCal.set(Calendar.MONTH, dueCal.get(Calendar.MONTH));
+                        finalReminderCal.set(Calendar.DAY_OF_MONTH, dueCal.get(Calendar.DAY_OF_MONTH));
+                    }
+                    finalReminderCal.set(Calendar.HOUR_OF_DAY, hour);
+                    finalReminderCal.set(Calendar.MINUTE, minute);
+                    finalReminderCal.set(Calendar.SECOND, 0);
+                    finalReminderCal.set(Calendar.MILLISECOND, 0);
+
+                    taskToEdit.setReminderTime(finalReminderCal.getTimeInMillis());
+                } else {
+                    taskToEdit.setReminderTime(null);
+                }
+
+                taskToEdit.setRepeatRule(repeatRule);
+                viewModel.updateTask(taskToEdit);
+
+                // Schedule/Cancel Alarm
+                if (taskToEdit.getReminderTime() != null) {
+                    // Nếu task đã hoàn thành thì KHÔNG đặt báo thức lại, dù có sửa giờ
+                    if (taskToEdit.getIsCompleted() == 1) {
+                        AlarmScheduler.cancelReminder(this, taskToEdit);
+                        Toast.makeText(this, "Task đã xong, không đặt báo thức", Toast.LENGTH_SHORT).show();
+                    } else if (taskToEdit.getReminderTime() > System.currentTimeMillis()) {
+                        try {
+                            AlarmScheduler.scheduleReminder(this, taskToEdit);
+                            Toast.makeText(this, "Đã đặt nhắc nhở", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(this, "Thời gian nhắc nhở đã qua", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    AlarmScheduler.cancelReminder(this, taskToEdit);
+                }
+
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        viewModel.refresh(selectedDateMillis);
+                        updateCalendarDots();
+                    }
+                }, 300);
+
+                Toast.makeText(this, "Đã cập nhật nhiệm vụ!", Toast.LENGTH_SHORT).show();
+                taskToEdit = null;
+
+            } catch (Exception e) {
+                Log.e("LichActivity", "Critical Error: " + e.getMessage());
+                e.printStackTrace();
+                Toast.makeText(this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
             }
-
-            // Cập nhật Reminder và Repeat
-            taskToEdit.setReminderTime(reminderMillis);
-            taskToEdit.setRepeatRule(repeatRule);
-
-            // Cập nhật UI ngay lập tức
-            adapter.notifyDataSetChanged();
-
-            // Lưu xuống DB
-            viewModel.updateTask(taskToEdit);
-
-            // Cài đặt hoặc hủy báo thức
-            if (reminderMillis != null) {
-                AlarmScheduler.scheduleReminder(this, taskToEdit);
-            } else {
-                AlarmScheduler.cancelReminder(this, taskToEdit);
-            }
-
-            // Refresh lại danh sách sau một chút
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                viewModel.refresh(selectedDateMillis);
-            }, 300);
-
-            taskToEdit = null;
-            Toast.makeText(this, "Đã cập nhật!", Toast.LENGTH_SHORT).show();
         });
 
         picker.show(getSupportFragmentManager(), "DateTimePicker_Edit");
     }
 
+    // --- SỬA: XỬ LÝ KHI NHẤN GIỮ -> ĐÁNH DẤU XONG ---
     @Override
     public void onTaskLongClick(Task task) {
         boolean isCompleted = (task.getIsCompleted() == 1);
@@ -205,15 +310,28 @@ public class LichActivity extends BaseActivity implements
                 .setTitle(task.getTitle())
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
+                        // Đảo ngược trạng thái
                         task.setIsCompleted(isCompleted ? 0 : 1);
                         viewModel.updateTask(task);
+
+                        // Logic hủy/bật báo thức tương tự onTaskStatusChanged
+                        if (task.getIsCompleted() == 1) {
+                            AlarmScheduler.cancelReminder(this, task);
+                            Toast.makeText(this, "Đã xong! Đã tắt nhắc nhở", Toast.LENGTH_SHORT).show();
+                        } else {
+                            if (task.getReminderTime() != null && task.getReminderTime() > System.currentTimeMillis()) {
+                                AlarmScheduler.scheduleReminder(this, task);
+                                Toast.makeText(this, "Đã bật lại nhắc nhở", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                             viewModel.refresh(selectedDateMillis);
                         }, 200);
                     } else if (which == 1) {
-                        // Hủy báo thức trước khi xóa
                         AlarmScheduler.cancelReminder(this, task);
                         viewModel.deleteTask(task, selectedDateMillis);
+                        updateCalendarDots();
                         Toast.makeText(this, "Đã xóa nhiệm vụ", Toast.LENGTH_SHORT).show();
                     }
                 })

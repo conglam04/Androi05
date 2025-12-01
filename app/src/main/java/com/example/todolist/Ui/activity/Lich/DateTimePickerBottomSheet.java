@@ -183,16 +183,31 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
         updateUI();
     }
 
-    private void setupChipListeners(View view) {
-        View chipToday = view.findViewById(R.id.chip_today);
-        View chipTomorrow = view.findViewById(R.id.chip_tomorrow);
-        View chip3Days = view.findViewById(R.id.chip_3days);
-        View chipNone = view.findViewById(R.id.chip_none);
-        View chipSunday = view.findViewById(R.id.chip_sunday);
+// ... Các phần import và biến khai báo giữ nguyên
 
-        chipToday.setOnClickListener(v -> setDateFromNow(0));
-        chipTomorrow.setOnClickListener(v -> setDateFromNow(1));
-        chip3Days.setOnClickListener(v -> setDateFromNow(3));
+    // 1. Sửa lại hàm này (tìm đến dòng setupChipListeners cũ và thay thế)
+    private void setupChipListeners(View view) {
+        // Phải ép kiểu về TextView để setTextColor được
+        TextView chipNone = view.findViewById(R.id.chip_none);
+        TextView chipToday = view.findViewById(R.id.chip_today);
+        TextView chipTomorrow = view.findViewById(R.id.chip_tomorrow);
+        TextView chipSunday = view.findViewById(R.id.chip_sunday);
+        TextView chip3Days = view.findViewById(R.id.chip_3days);
+
+        chipToday.setOnClickListener(v -> {
+            setDateFromNow(0);
+            updateChipSelection(chipToday, chipNone, chipTomorrow, chipSunday, chip3Days);
+        });
+
+        chipTomorrow.setOnClickListener(v -> {
+            setDateFromNow(1);
+            updateChipSelection(chipTomorrow, chipToday, chipNone, chipSunday, chip3Days);
+        });
+
+        chip3Days.setOnClickListener(v -> {
+            setDateFromNow(3);
+            updateChipSelection(chip3Days, chipToday, chipTomorrow, chipNone, chipSunday);
+        });
 
         chipSunday.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
@@ -202,6 +217,8 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
             }
             selectedDateMillis = c.getTimeInMillis();
             calendarView.setDate(selectedDateMillis, true, true);
+
+            updateChipSelection(chipSunday, chipToday, chipTomorrow, chipNone, chip3Days);
         });
 
         chipNone.setOnClickListener(v -> {
@@ -209,8 +226,25 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
             selectedTimeMillis = null;
             Toast.makeText(requireContext(), "Đã bỏ chọn ngày", Toast.LENGTH_SHORT).show();
             updateUI();
+
+            updateChipSelection(chipNone, chipToday, chipTomorrow, chipSunday, chip3Days);
         });
     }
+
+    // 2. Thêm hàm mới này vào dưới cùng class (hoặc ngay sau hàm setupChipListeners)
+    private void updateChipSelection(TextView selectedChip, TextView... otherChips) {
+        // Set màu xanh cho chip được chọn
+        selectedChip.setBackgroundResource(R.drawable.bg_chip_selected); // Màu xanh (file bạn đã có)
+        selectedChip.setTextColor(getResources().getColor(R.color.white, null));
+
+        // Set màu xám cho các chip còn lại
+        for (TextView chip : otherChips) {
+            chip.setBackgroundResource(R.drawable.bg_chip_gray); // Màu xám (file bạn đã có)
+            chip.setTextColor(getResources().getColor(R.color.text_primary, null)); // Màu chữ đen
+        }
+    }
+
+    // ... Các hàm khác giữ nguyên
 
     private void setDateFromNow(int daysToAdd) {
         Calendar c = Calendar.getInstance();
