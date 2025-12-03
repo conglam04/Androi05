@@ -1,6 +1,5 @@
 package com.example.todolist.Ui.maintaskfragement;
 
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -132,7 +131,11 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
     }
     private void showDateTimePicker()
     {
-        DateTimePickerBottomSheet picker = DateTimePickerBottomSheet.newInstance(selectedRecurrenceRule);
+        DateTimePickerBottomSheet picker = DateTimePickerBottomSheet.newInstance(
+                selectedDueDate,
+                selectedReminderDate,
+                selectedRecurrenceRule
+        );
         picker.setOnDateTimeSelectedListener((timestamp, reminderTimestamp, repeatRule) -> {
             if (timestamp != -1) {
                 selectedDueDate = timestamp;
@@ -142,6 +145,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
             } else {
                 selectedDueDate = null;
                 Toast.makeText(requireContext(), "Bỏ chọn ngày", Toast.LENGTH_SHORT).show();
+                btnSetTime.clearColorFilter();
             }
 
             // Update reminder timestamp
@@ -150,12 +154,16 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
                 btnSetReminder.setColorFilter(getResources().getColor(R.color.primary, null));
             } else {
                 selectedReminderDate = null;
+                btnSetReminder.clearColorFilter();
             }
 
             // Update recurrence rule
             if (repeatRule != null) {
                 selectedRecurrenceRule = repeatRule;
                 btnSetRepeat.setColorFilter(getResources().getColor(R.color.primary, null));
+            } else {
+                selectedRecurrenceRule = null;
+                btnSetRepeat.clearColorFilter();
             }
         });
         picker.show(getParentFragmentManager(), "DateTimePicker");
@@ -181,77 +189,80 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
         builder.show();
     }
 
-    /**
-     * Show time picker for reminder (time only, same day as task deadline)
-     */
     private void showReminderTimePicker() {
-        // If due date is not set, auto-set to today 23:59
-        if (selectedDueDate == null) {
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, 23);
-            cal.set(Calendar.MINUTE, 59);
-            cal.set(Calendar.SECOND, 59);
-            cal.set(Calendar.MILLISECOND, 999);
-            selectedDueDate = cal.getTimeInMillis();
-
-            // Update UI to show that due date is set
-            btnSetTime.setColorFilter(getResources().getColor(R.color.primary, null));
-        }
-
-        // Get current hour/minute from due date or current time
-        Calendar currentCal = Calendar.getInstance();
+        // Get base date from selectedDueDate or current date
+        Calendar baseDateCal = Calendar.getInstance();
         if (selectedDueDate != null) {
-            currentCal.setTimeInMillis(selectedDueDate);
+            baseDateCal.setTimeInMillis(selectedDueDate);
         }
-        int hour = currentCal.get(Calendar.HOUR_OF_DAY);
-        int minute = currentCal.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(
-                requireContext(),
-                (timeView, hourOfDay, minuteSelected) -> {
-                    // Merge reminder time with due date
-                    Calendar dueCalendar = Calendar.getInstance();
-                    dueCalendar.setTimeInMillis(selectedDueDate);
+        // Get current hour/minute from existing reminder or now
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int minute = Calendar.getInstance().get(Calendar.MINUTE);
+        if (selectedReminderDate != null) {
+            Calendar reminderCal = Calendar.getInstance();
+            reminderCal.setTimeInMillis(selectedReminderDate);
+            hour = reminderCal.get(Calendar.HOUR_OF_DAY);
+            minute = reminderCal.get(Calendar.MINUTE);
+        }
 
-                    Calendar reminderCalendar = Calendar.getInstance();
-                    reminderCalendar.setTimeInMillis(selectedDueDate); // Same date as due date
-                    reminderCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    reminderCalendar.set(Calendar.MINUTE, minuteSelected);
-                    reminderCalendar.set(Calendar.SECOND, 0);
-                    reminderCalendar.set(Calendar.MILLISECOND, 0);
+        // Use MaterialTimePicker (like in Lich package)
+        com.google.android.material.timepicker.MaterialTimePicker picker =
+                new com.google.android.material.timepicker.MaterialTimePicker.Builder()
+                .setTimeFormat(com.google.android.material.timepicker.TimeFormat.CLOCK_24H)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTitleText("Đặt giờ nhắc nhở")
+                .setInputMode(com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build();
 
-                    long reminderTime = reminderCalendar.getTimeInMillis();
+        picker.addOnPositiveButtonClickListener(v -> {
+            int h = picker.getHour();
+            int m = picker.getMinute();
 
-                    // Validate: Reminder must be before due time
+            // Create reminder time based on base date
+            Calendar reminderCal = (Calendar) baseDateCal.clone();
+            reminderCal.set(Calendar.HOUR_OF_DAY, h);
+            reminderCal.set(Calendar.MINUTE, m);
+            reminderCal.set(Calendar.SECOND, 0);
+            reminderCal.set(Calendar.MILLISECOND, 0);
+
+            long reminderTime = reminderCal.getTimeInMillis();
+
+            // Validate: Reminder must be in future
+            if (reminderTime <= System.currentTimeMillis()) {
+                Toast.makeText(requireContext(),
+                        "Thời gian nhắc nhở phải ở tương lai!",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            // Validate: Reminder must be before due time (if due date has specific time)
+            if (selectedDueDate != null) {
+                Calendar dueCal = Calendar.getInstance();
+                dueCal.setTimeInMillis(selectedDueDate);
+                // Only check if due date has specific time (not end of day)
+                if (dueCal.get(Calendar.HOUR_OF_DAY) != 23 || dueCal.get(Calendar.MINUTE) != 59) {
                     if (reminderTime >= selectedDueDate) {
                         Toast.makeText(requireContext(),
                                 "Thời gian nhắc nhở phải trước giờ deadline!",
                                 Toast.LENGTH_LONG).show();
                         return;
                     }
+                }
+            }
 
-                    // Validate: Reminder must be in future
-                    if (reminderTime <= System.currentTimeMillis()) {
-                        Toast.makeText(requireContext(),
-                                "Thời gian nhắc nhở phải ở tương lai!",
-                                Toast.LENGTH_LONG).show();
-                        return;
-                    }
+            // Save reminder time
+            selectedReminderDate = reminderTime;
+            btnSetReminder.setColorFilter(getResources().getColor(R.color.primary, null));
 
-                    // All validation passed
-                    selectedReminderDate = reminderTime;
-                    Toast.makeText(requireContext(),
-                            "Đã đặt nhắc nhở lúc " + String.format("%02d:%02d", hourOfDay, minuteSelected),
-                            Toast.LENGTH_SHORT).show();
-                    btnSetReminder.setColorFilter(getResources().getColor(R.color.primary, null));
-                },
-                hour,
-                minute,
-                true // 24-hour format
-        );
+            String timeStr = String.format(java.util.Locale.getDefault(), "%02d:%02d", h, m);
+            Toast.makeText(requireContext(),
+                    "Đã đặt nhắc nhở lúc " + timeStr,
+                    Toast.LENGTH_SHORT).show();
+        });
 
-        timePickerDialog.setTitle("Chọn giờ nhắc nhở (cùng ngày với task)");
-        timePickerDialog.show();
+        picker.show(getParentFragmentManager(), "ReminderPicker");
     }
 
 

@@ -1,13 +1,11 @@
 package com.example.todolist.Ui.maintaskfragement;
 
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,10 +23,6 @@ import java.util.Locale;
 
 public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
 
-    public DateTimePickerBottomSheet(RecurrenceRule selectedRecurrenceRule) {
-        this.selectedRecurrenceRule = selectedRecurrenceRule;
-    }
-
     public interface OnDateTimeSelectedListener {
         void onDateTimeSelected(long timestamp, Long reminderTimestamp, RecurrenceRule repeatRule);
     }
@@ -38,18 +32,32 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
     private CalendarView calendarView;
     private TextView valueTime, valueReminder, valueRepeat;
     private ImageButton btnClose, btnOk;
-    private ImageView btnIdea;
     private long selectedDateMillis = -1;
     private Long selectedTimeMillis = null;
     private Long selectedReminderMillis = null;
     private RecurrenceRule selectedRecurrenceRule;
 
-
     private final DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-    public static DateTimePickerBottomSheet newInstance(RecurrenceRule selectedRecurrenceRule) {
-        return new DateTimePickerBottomSheet(selectedRecurrenceRule);
+    public DateTimePickerBottomSheet() {
+        // Required empty public constructor
+    }
+
+    public static DateTimePickerBottomSheet newInstance(Long initialDueDate, Long initialReminderDate, RecurrenceRule recurrenceRule) {
+        DateTimePickerBottomSheet fragment = new DateTimePickerBottomSheet();
+        Bundle args = new Bundle();
+        if (initialDueDate != null) {
+            args.putLong("dueDate", initialDueDate);
+        }
+        if (initialReminderDate != null) {
+            args.putLong("reminderDate", initialReminderDate);
+        }
+        if (recurrenceRule != null) {
+            args.putSerializable("recurrenceRule", recurrenceRule);
+        }
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public void setOnDateTimeSelectedListener(OnDateTimeSelectedListener l) {
@@ -73,14 +81,38 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
         btnOk = view.findViewById(R.id.btnOk);
 //        btnIdea = view.findViewById(R.id.findViewById);
 
-        // init selectedDate = today
-        selectedDateMillis = calendarView.getDate();
+        // Initialize from arguments if provided
+        if (getArguments() != null) {
+            if (getArguments().containsKey("dueDate")) {
+                selectedDateMillis = getArguments().getLong("dueDate");
+                Calendar dueCal = Calendar.getInstance();
+                dueCal.setTimeInMillis(selectedDateMillis);
+                selectedTimeMillis = selectedDateMillis;
+                calendarView.setDate(selectedDateMillis, false, false);
+            } else {
+                selectedDateMillis = calendarView.getDate();
+            }
+
+            if (getArguments().containsKey("reminderDate")) {
+                selectedReminderMillis = getArguments().getLong("reminderDate");
+            }
+
+            if (getArguments().containsKey("recurrenceRule")) {
+                selectedRecurrenceRule = (RecurrenceRule) getArguments().getSerializable("recurrenceRule");
+            }
+        } else {
+            // init selectedDate = today
+            selectedDateMillis = calendarView.getDate();
+        }
 
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             Calendar c = Calendar.getInstance();
             c.set(year, month, dayOfMonth, 0, 0, 0);
             c.set(Calendar.MILLISECOND, 0);
             selectedDateMillis = c.getTimeInMillis();
+
+            // Check if selected date matches any quick select chip and highlight it
+            checkAndHighlightMatchingChip(view);
         });
 
         // chips quick actions (today, tomorrow, 3 days...) - using IDs from layout
@@ -228,14 +260,42 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void showTimePicker(boolean isDueTime) {
-        final Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+        // Get current time or existing selected time
+        Calendar currentCal = Calendar.getInstance();
+        int hour = currentCal.get(Calendar.HOUR_OF_DAY);
+        int minute = currentCal.get(Calendar.MINUTE);
 
-        TimePickerDialog tpd = new TimePickerDialog(requireContext(), (view, hourOfDay, minute1) -> {
+        // If editing existing time, use that value
+        if (isDueTime && selectedTimeMillis != null) {
+            currentCal.setTimeInMillis(selectedTimeMillis);
+            hour = currentCal.get(Calendar.HOUR_OF_DAY);
+            minute = currentCal.get(Calendar.MINUTE);
+        } else if (!isDueTime && selectedReminderMillis != null) {
+            currentCal.setTimeInMillis(selectedReminderMillis);
+            hour = currentCal.get(Calendar.HOUR_OF_DAY);
+            minute = currentCal.get(Calendar.MINUTE);
+        }
+
+        // Use MaterialTimePicker (like in Lich package)
+        String title = isDueTime ? "Đặt giờ deadline" : "Đặt giờ nhắc nhở";
+
+        com.google.android.material.timepicker.MaterialTimePicker picker =
+                new com.google.android.material.timepicker.MaterialTimePicker.Builder()
+                .setTimeFormat(com.google.android.material.timepicker.TimeFormat.CLOCK_24H)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTitleText(title)
+                .setInputMode(com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build();
+
+        picker.addOnPositiveButtonClickListener(v -> {
+            int h = picker.getHour();
+            int m = picker.getMinute();
+
+            // Create time calendar
             Calendar sel = Calendar.getInstance();
-            sel.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            sel.set(Calendar.MINUTE, minute1);
+            sel.set(Calendar.HOUR_OF_DAY, h);
+            sel.set(Calendar.MINUTE, m);
             sel.set(Calendar.SECOND, 0);
             sel.set(Calendar.MILLISECOND, 0);
 
@@ -246,9 +306,9 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
                 selectedReminderMillis = sel.getTimeInMillis();
                 valueReminder.setText(timeFormat.format(selectedReminderMillis));
             }
-        }, hour, minute, true);
+        });
 
-        tpd.show();
+        picker.show(getParentFragmentManager(), isDueTime ? "TimePickerDue" : "TimePickerReminder");
     }
 
     private void showRepeatDialog() {
@@ -274,5 +334,75 @@ public class DateTimePickerBottomSheet extends BottomSheetDialogFragment {
                 ((TextView) chip).setTextColor(getResources().getColor(R.color.text_primary, null));
             }
         }
+    }
+
+    private void checkAndHighlightMatchingChip(View parentView) {
+        if (selectedDateMillis == -1) {
+            return;
+        }
+
+        View chipToday = parentView.findViewById(R.id.chip_today);
+        View chipTomorrow = parentView.findViewById(R.id.chip_tomorrow);
+        View chip3Days = parentView.findViewById(R.id.chip_3days);
+        View chipSunday = parentView.findViewById(R.id.chip_sunday);
+        View chipNone = parentView.findViewById(R.id.chip_none);
+
+        // Get selected date (reset time to compare only dates)
+        Calendar selectedCal = Calendar.getInstance();
+        selectedCal.setTimeInMillis(selectedDateMillis);
+        selectedCal.set(Calendar.HOUR_OF_DAY, 0);
+        selectedCal.set(Calendar.MINUTE, 0);
+        selectedCal.set(Calendar.SECOND, 0);
+        selectedCal.set(Calendar.MILLISECOND, 0);
+
+        // Check today
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        if (isSameDay(selectedCal, today)) {
+            updateChipSelection(chipToday, chipNone, chipTomorrow, chip3Days, chipSunday);
+            return;
+        }
+
+        // Check tomorrow
+        Calendar tomorrow = (Calendar) today.clone();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+
+        if (isSameDay(selectedCal, tomorrow)) {
+            updateChipSelection(chipTomorrow, chipNone, chipToday, chip3Days, chipSunday);
+            return;
+        }
+
+        // Check 3 days later
+        Calendar threeDays = (Calendar) today.clone();
+        threeDays.add(Calendar.DAY_OF_YEAR, 3);
+
+        if (isSameDay(selectedCal, threeDays)) {
+            updateChipSelection(chip3Days, chipNone, chipToday, chipTomorrow, chipSunday);
+            return;
+        }
+
+        // Check next Sunday
+        Calendar nextSunday = (Calendar) today.clone();
+        while (nextSunday.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+            nextSunday.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        if (isSameDay(selectedCal, nextSunday)) {
+            updateChipSelection(chipSunday, chipNone, chipToday, chipTomorrow, chip3Days);
+            return;
+        }
+
+        // If no match, don't highlight any chip (keep current state or highlight none)
+        // Reset all chips to gray
+        updateChipSelection(chipNone, chipToday, chipTomorrow, chip3Days, chipSunday);
+    }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 }

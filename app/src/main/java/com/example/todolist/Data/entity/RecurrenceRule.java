@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "recurrence_rules")
-public class RecurrenceRule {
+public class RecurrenceRule implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long ruleId;
 

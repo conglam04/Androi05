@@ -73,7 +73,7 @@ public class NotificationHelper {
 
         // Build notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_bell)
                 .setContentTitle(taskTitle)
                 .setContentText(taskDescription.isEmpty() ? "Đã đến giờ làm việc!" : taskDescription)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
