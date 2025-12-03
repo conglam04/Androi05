@@ -24,6 +24,8 @@ import com.example.todolist.Data.entity.TaskWithCategory;
 import com.example.todolist.R;
 import com.example.todolist.Ui.adapter.CategoryTabAdapter;
 import com.example.todolist.Ui.adapter.TaskAdapterMain;
+import com.example.todolist.Ui.maintaskfragement.AddTaskBottomSheet;
+import com.example.todolist.Ui.maintaskfragement.FocusTimerActivity;
 import com.example.todolist.Ui.viewmodel.TasksViewModel;
 import com.example.todolist.Ui.widget.SwipeManager;
 import com.google.android.material.chip.ChipGroup;
@@ -79,7 +81,7 @@ public class TaskFragment extends Fragment {
 
         fabAddTask.setOnClickListener(v -> {
             closeAllOpenedItems();
-            AddTaskBottomSheet bottomSheet = AddTaskBottomSheet.newInstance();
+            com.example.todolist.Ui.maintaskfragement.AddTaskBottomSheet bottomSheet = AddTaskBottomSheet.newInstance();
             bottomSheet.show(getParentFragmentManager(), "AddTaskBottomSheet");
         });
 

@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_theme"
+            android:icon="@drawable/ic_theme"
+            android:title="Chủ đề" />
+        <item
+            android:id="@+id/nav_faq"
+            android:icon="@drawable/ic_faq"
+            android:title="FAQ" />
+        <item
+            android:id="@+id/nav_feedback"
+            android:icon="@drawable/ic_feedback"
+            android:title="Phản hồi" />
+        <item
+            android:id="@+id/nav_advance_setting"
+            android:icon="@drawable/ic_settings"
+            android:title="Cài đặt nâng cao" />
+        <item
+            android:id="@+id/nav_starred_tasks"
+            android:icon="@drawable/ic_star"
+            android:title="Nhiệm vụ gắn sao" />
+    </group>
+</menu>

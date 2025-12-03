@@ -22,6 +22,9 @@ import com.example.todolist.Data.Repository.TaskRepository;
 import com.example.todolist.Data.entity.Task;
 import com.example.todolist.R;
 import com.example.todolist.Ui.activity.BaseActivity;
+import com.example.todolist.Ui.activity.Lich.AddTaskBottomSheet;
+import com.example.todolist.Ui.activity.Lich.AlarmScheduler;
+import com.example.todolist.Ui.activity.Lich.DateTimePickerBottomSheet;
 import com.example.todolist.Ui.adapter.TaskAdapter;
 import com.example.todolist.Ui.widget.EventDecorator;
 import com.example.todolist.ViewModel.LichViewModel;
@@ -82,7 +85,7 @@ public class LichActivity extends BaseActivity implements
 
         viewModel = new ViewModelProvider(this).get(LichViewModel.class);
         viewModel.getTasksLiveData().observe(this, tasks -> {
-            adapter.updateTasks(tasks);
+            adapter.updateTasksWithCategory(tasks);
             updateCalendarDots();
         });
 
@@ -162,19 +165,14 @@ public class LichActivity extends BaseActivity implements
         }, 300);
     }
 
-    // --- SỬA: XỬ LÝ KHI TÍCH CHECKBOX ---
     @Override
     public void onTaskStatusChanged(Task task) {
-        // 1. Cập nhật trạng thái vào DB
         viewModel.updateTask(task);
 
-        // 2. Xử lý Báo thức
         if (task.getIsCompleted() == 1) {
-            // Nếu hoàn thành -> HỦY báo thức
             AlarmScheduler.cancelReminder(this, task);
             Toast.makeText(this, "Đã xong! Đã tắt nhắc nhở", Toast.LENGTH_SHORT).show();
         } else {
-            // Nếu bỏ tích -> BẬT LẠI báo thức (nếu chưa quá hạn)
             if (task.getReminderTime() != null && task.getReminderTime() > System.currentTimeMillis()) {
                 AlarmScheduler.scheduleReminder(this, task);
                 Toast.makeText(this, "Đã kích hoạt lại nhắc nhở", Toast.LENGTH_SHORT).show();
@@ -210,7 +208,6 @@ public class LichActivity extends BaseActivity implements
             try {
                 if (taskToEdit == null) return;
 
-                // Update Due Date
                 long finalDueDate = 0;
                 if (dateMillis != null) {
                     Calendar finalCal = Calendar.getInstance();
@@ -231,7 +228,6 @@ public class LichActivity extends BaseActivity implements
                     taskToEdit.setDueDate(null);
                 }
 
-                // Update Reminder (Logic đồng bộ ngày)
                 if (reminderMillis != null) {
                     Calendar timePickerCal = Calendar.getInstance();
                     timePickerCal.setTimeInMillis(reminderMillis);
@@ -259,9 +255,7 @@ public class LichActivity extends BaseActivity implements
                 taskToEdit.setRepeatRule(repeatRule);
                 viewModel.updateTask(taskToEdit);
 
-                // Schedule/Cancel Alarm
                 if (taskToEdit.getReminderTime() != null) {
-                    // Nếu task đã hoàn thành thì KHÔNG đặt báo thức lại, dù có sửa giờ
                     if (taskToEdit.getIsCompleted() == 1) {
                         AlarmScheduler.cancelReminder(this, taskToEdit);
                         Toast.makeText(this, "Task đã xong, không đặt báo thức", Toast.LENGTH_SHORT).show();
@@ -299,7 +293,6 @@ public class LichActivity extends BaseActivity implements
         picker.show(getSupportFragmentManager(), "DateTimePicker_Edit");
     }
 
-    // --- SỬA: XỬ LÝ KHI NHẤN GIỮ -> ĐÁNH DẤU XONG ---
     @Override
     public void onTaskLongClick(Task task) {
         boolean isCompleted = (task.getIsCompleted() == 1);
@@ -310,11 +303,9 @@ public class LichActivity extends BaseActivity implements
                 .setTitle(task.getTitle())
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        // Đảo ngược trạng thái
                         task.setIsCompleted(isCompleted ? 0 : 1);
                         viewModel.updateTask(task);
 
-                        // Logic hủy/bật báo thức tương tự onTaskStatusChanged
                         if (task.getIsCompleted() == 1) {
                             AlarmScheduler.cancelReminder(this, task);
                             Toast.makeText(this, "Đã xong! Đã tắt nhắc nhở", Toast.LENGTH_SHORT).show();
@@ -327,12 +318,23 @@ public class LichActivity extends BaseActivity implements
 
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                             viewModel.refresh(selectedDateMillis);
+                            updateCalendarDots();
                         }, 200);
                     } else if (which == 1) {
-                        AlarmScheduler.cancelReminder(this, task);
-                        viewModel.deleteTask(task, selectedDateMillis);
-                        updateCalendarDots();
-                        Toast.makeText(this, "Đã xóa nhiệm vụ", Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(this)
+                                .setTitle("Xác nhận xóa")
+                                .setMessage("Bạn có chắc muốn xóa nhiệm vụ này không?")
+                                .setPositiveButton("Xóa", (d, w) -> {
+                                    viewModel.deleteTask(task, selectedDateMillis);
+                                    AlarmScheduler.cancelReminder(this, task);
+                                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                                        viewModel.refresh(selectedDateMillis);
+                                        updateCalendarDots();
+                                        Toast.makeText(this, "Đã xóa nhiệm vụ", Toast.LENGTH_SHORT).show();
+                                    }, 200);
+                                })
+                                .setNegativeButton("Hủy", null)
+                                .show();
                     }
                 })
                 .show();

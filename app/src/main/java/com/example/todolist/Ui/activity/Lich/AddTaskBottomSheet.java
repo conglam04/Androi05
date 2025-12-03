@@ -19,9 +19,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.todolist.R;
 import com.example.todolist.Data.Repository.TaskRepository;
 import com.example.todolist.Data.entity.Task;
+import com.example.todolist.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -166,7 +166,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void showCategoryPicker() {
-        CategoryBottomSheet picker = new CategoryBottomSheet();
+        com.example.todolist.Ui.activity.Lich.CategoryBottomSheet picker = new CategoryBottomSheet();
         picker.setCategorySelectedListener(category -> {
             this.selectedCategoryName = category;
             if (textCategoryLabel != null) {
@@ -206,7 +206,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
             strReminder = timeFormat.format(new java.util.Date(selectedReminder));
         }
 
-        DateTimePickerBottomSheet picker = DateTimePickerBottomSheet.newInstance(strDate, strTime, strReminder, selectedRepeat);
+        com.example.todolist.Ui.activity.Lich.DateTimePickerBottomSheet picker = DateTimePickerBottomSheet.newInstance(strDate, strTime, strReminder, selectedRepeat);
 
         picker.setOnDateTimeSelectedListener((dateMillis, timeMillis, reminderMillis, repeatRule) -> {
             this.dateTimePickerWasUsed = true;

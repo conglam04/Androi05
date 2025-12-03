@@ -46,7 +46,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     // Callback để thêm các Category mặc định khi tạo DB
-    private static final RoomDatabase.Callback roomCallback = new RoomDatabase.Callback() {
+    private static final Callback roomCallback = new Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);

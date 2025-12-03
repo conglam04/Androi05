@@ -10,6 +10,8 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.todolist.Ui.widget.SwipeManager;
+
 public class SwipeRevealLayout extends FrameLayout {
     private static final int INVALID_POINTER = -1;
 

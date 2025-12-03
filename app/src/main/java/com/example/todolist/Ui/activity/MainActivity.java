@@ -5,38 +5,42 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.todolist.R;
+import com.example.todolist.Ui.activity.BaseActivity;
 import com.example.todolist.Ui.activity.Lich.LichActivity;
 import com.example.todolist.Ui.activity.thongke.ThongKeActivity;
 import com.example.todolist.Ui.maintaskfragement.TaskFragment;
+import com.example.todolist.Ui.setting.AdvanceSettingActivity;
+import com.example.todolist.Ui.setting.FaqActivity;
+import com.example.todolist.Ui.setting.FeedbackActivity;
+import com.example.todolist.Ui.setting.StarredTasksActivity;
+import com.example.todolist.Ui.theme.ThemeActivity;
 import com.example.todolist.utils.NotificationHelper;
 import com.example.todolist.utils.RecurringTaskScheduler;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends BaseActivity{
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private DrawerLayout drawerLayout;
     private BottomNavigationView bottomNavigationView;
-    // Permission launcher for notifications
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission granted - notifications will work
-                } else {
-                    // Permission denied - show message to user
+                if (!isGranted) {
                     android.widget.Toast.makeText(this,
                             "Không thể gửi thông báo nhắc nhở nếu không có quyền",
                             android.widget.Toast.LENGTH_LONG).show();
@@ -54,34 +58,29 @@ public class MainActivity extends BaseActivity{
             return insets;
         });
 
-        // Setup toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav, R.string.close_nav);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new TaskFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_theme);
         }
 
-        // Handle navigation icon click (menu)
-        toolbar.setNavigationOnClickListener(v -> {
-            android.widget.Toast.makeText(this, "Menu clicked", android.widget.Toast.LENGTH_SHORT).show();
-
-        });
-
-        // Create notification channel for reminders
         NotificationHelper.createNotificationChannel(this);
-
-        // Request notification permission for Android 13+
         requestNotificationPermission();
-
-        // Lên lịch cho công việc chạy nền để tạo các task lặp lại hàng ngày
         RecurringTaskScheduler.scheduleDailyTaskCreation(this);
 
-        // Setup bottom navigation
         bottomNavigationView = findViewById(R.id.bottomNavigation);
         setupBottomNavigation();
 
-        // Load default fragment (Tasks)
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -92,24 +91,15 @@ public class MainActivity extends BaseActivity{
 
     private void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
             int itemId = item.getItemId();
-
             if (itemId == R.id.navigation_tasks) {
-                selectedFragment = new TaskFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new TaskFragment()).commit();
+                return true;
             } else if (itemId == R.id.navigation_calendar) {
-                Intent intent = new Intent(this, LichActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(this, LichActivity.class));
+                return true;
             } else if (itemId == R.id.navigation_profile) {
-                Intent intent = new Intent(this, ThongKeActivity.class);
-                startActivity(intent);
-            }
-
-            if (selectedFragment != null) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container, selectedFragment)
-                        .commit();
+                startActivity(new Intent(this, ThongKeActivity.class));
                 return true;
             }
             return false;
@@ -117,29 +107,36 @@ public class MainActivity extends BaseActivity{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_tasks, menu);
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_theme) {
+            startActivity(new Intent(this, ThemeActivity.class));
+        } else if (itemId == R.id.nav_faq) {
+            startActivity(new Intent(this, FaqActivity.class));
+        } else if (itemId == R.id.nav_feedback) {
+            startActivity(new Intent(this, FeedbackActivity.class));
+        } else if (itemId == R.id.nav_advance_setting) {
+            startActivity(new Intent(this, AdvanceSettingActivity.class));
+        } else if (itemId == R.id.nav_starred_tasks) {
+            startActivity(new Intent(this, StarredTasksActivity.class));
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-
-        if (itemId == R.id.action_search) {
-            android.widget.Toast.makeText(this, "Search clicked", android.widget.Toast.LENGTH_SHORT).show();
-
-            return true;
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Request permission
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }

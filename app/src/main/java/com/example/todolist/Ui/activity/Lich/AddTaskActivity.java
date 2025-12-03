@@ -8,9 +8,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.todolist.R; // Sửa import R
-import com.example.todolist.Data.Repository.TaskRepository; // Dùng Repository
+import com.example.todolist.Data.Repository.TaskRepository;
 import com.example.todolist.Data.entity.Task;
+import com.example.todolist.R;
 
 import java.util.Calendar;
 

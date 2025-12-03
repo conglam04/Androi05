@@ -8,4 +8,6 @@
     </string-array>
     <string name="start">Bắt đầu</string>
     <string name="pause">Tạm dừng</string>
+    <string name="open_nav">Open</string>
+    <string name="close_nav">Close</string>
 </resources>

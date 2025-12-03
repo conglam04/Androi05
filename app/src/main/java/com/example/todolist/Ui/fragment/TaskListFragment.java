@@ -47,7 +47,7 @@ public class TaskListFragment extends Fragment {
 
         // 4. Setup Adapter
         // Truyền vào list rỗng ban đầu và lắng nghe sự kiện
-        adapter = new TaskAdapter(new ArrayList<>(), new TaskAdapter.OnTaskClickListener() {
+        adapter = new TaskAdapter(new ArrayList<TaskWithCategory>(), new TaskAdapter.OnTaskClickListener() {
             @Override
             public void onTaskStatusChanged(Task task) {
                 // Cập nhật trạng thái vào Database
@@ -77,7 +77,7 @@ public class TaskListFragment extends Fragment {
         // Khi DB thay đổi hoặc loadTasks() được gọi, hàm này sẽ chạy và cập nhật UI
         taskViewModel.getAllTasks().observe(getViewLifecycleOwner(), tasks -> {
             if (tasks != null) {
-                adapter.updateTasks(tasks);
+                adapter.updateTasksWithCategory(tasks);
             }
         });
     }

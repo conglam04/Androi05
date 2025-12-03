@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.todolist.Data.Repository.TaskRepository;
-import com.example.todolist.Data.entity.Task;
 import com.example.todolist.Data.entity.TaskWithCategory;
 
 import java.util.LinkedHashMap;

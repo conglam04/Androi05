@@ -8,6 +8,9 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.example.todolist.Data.entity.Category;
+import com.example.todolist.Data.entity.User;
+
 @Entity(
         tableName = "tasks",
         foreignKeys = {

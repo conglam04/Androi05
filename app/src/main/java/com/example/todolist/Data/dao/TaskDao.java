@@ -119,4 +119,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE parentTaskId = :parentTaskId AND due_date = :dueDate LIMIT 1")
     Task getTaskInstanceByParentAndDate(long parentTaskId, long dueDate);
+
+    @Query("SELECT * FROM tasks WHERE is_starred = 1 AND user_id = :userId")
+    List<Task> getStarredTasks(int userId);
 }

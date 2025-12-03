@@ -4,7 +4,7 @@ import java.lang.ref.WeakReference;
 
 public class SwipeManager {
     private static SwipeManager instance;
-    private WeakReference<SwipeRevealLayout> openedSwipeLayout;
+    private WeakReference<com.example.todolist.Ui.widget.SwipeRevealLayout> openedSwipeLayout;
 
     private SwipeManager() {}
 
@@ -15,10 +15,10 @@ public class SwipeManager {
         return instance;
     }
 
-    public void onSwipeOpened(SwipeRevealLayout layout) {
+    public void onSwipeOpened(com.example.todolist.Ui.widget.SwipeRevealLayout layout) {
         // Đóng layout cũ nếu có
         if (openedSwipeLayout != null) {
-            SwipeRevealLayout oldLayout = openedSwipeLayout.get();
+            com.example.todolist.Ui.widget.SwipeRevealLayout oldLayout = openedSwipeLayout.get();
             if (oldLayout != null && oldLayout != layout) {
                 oldLayout.animateClose();
             }
@@ -27,9 +27,9 @@ public class SwipeManager {
         openedSwipeLayout = new WeakReference<>(layout);
     }
 
-    public void onSwipeClosed(SwipeRevealLayout layout) {
+    public void onSwipeClosed(com.example.todolist.Ui.widget.SwipeRevealLayout layout) {
         if (openedSwipeLayout != null) {
-            SwipeRevealLayout currentLayout = openedSwipeLayout.get();
+            com.example.todolist.Ui.widget.SwipeRevealLayout currentLayout = openedSwipeLayout.get();
             if (currentLayout == layout) {
                 openedSwipeLayout = null;
             }

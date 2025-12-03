@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.todolist.Data.entity.TaskWithCategory;
 import com.example.todolist.R;
 import com.example.todolist.Ui.widget.SwipeManager;

@@ -36,6 +36,18 @@
             </intent-filter>
         </activity>
 
+        <!-- Áp dụng một chủ đề tiêu chuẩn, ổn định để gỡ lỗi -->
+        <activity
+            android:name=".Ui.setting.SettingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+
+        <activity android:name=".Ui.setting.AdvanceSettingActivity" android:exported="false"/>
+        <activity android:name=".Ui.setting.FaqActivity" android:exported="false"/>
+        <activity android:name=".Ui.setting.FeedbackActivity" android:exported="false"/>
+        <activity android:name=".Ui.setting.StarredTasksActivity" android:exported="false"/>
+        <activity android:name="com.example.todolist.Ui.theme.ThemeActivity" android:exported="false"/>
+
         <receiver
             android:name=".Ui.activity.Lich.AlarmReceiver"
             android:exported="false"/>

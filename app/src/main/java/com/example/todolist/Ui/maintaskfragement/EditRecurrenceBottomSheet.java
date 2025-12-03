@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-
 import com.example.todolist.Data.entity.Task;
 import com.example.todolist.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;

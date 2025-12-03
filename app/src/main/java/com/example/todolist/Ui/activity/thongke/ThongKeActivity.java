@@ -20,8 +20,8 @@ import com.example.todolist.Data.entity.TaskWithCategory;
 import com.example.todolist.R;
 import com.example.todolist.Ui.activity.BaseActivity;
 import com.example.todolist.Ui.activity.Login.HelloActivity;
-import com.example.todolist.utils.ChartUtils;
 import com.example.todolist.ViewModel.TaskViewModel;
+import com.example.todolist.utils.ChartUtils;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 

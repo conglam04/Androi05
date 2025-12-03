@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-
 import com.example.todolist.Data.Repository.TaskRepository;
 import com.example.todolist.Data.entity.RecurrenceRule;
 import com.example.todolist.Data.entity.Task;

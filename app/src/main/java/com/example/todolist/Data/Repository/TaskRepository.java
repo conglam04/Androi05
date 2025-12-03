@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -141,6 +140,14 @@ public class TaskRepository {
 
     public List<TaskWithCategory> getAllTasks() {
         return taskDao.getAllTasks(getCachedUserId());
+    }
+
+    public List<Task> getStarredTasks() {
+        try {
+            return executorService.submit(() -> taskDao.getStarredTasks(getCachedUserId())).get();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public List<TaskWithCategory> getTasksByDateRange(long start, long end) {

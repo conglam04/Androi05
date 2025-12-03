@@ -5,13 +5,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todolist.Data.entity.Task;
 import com.example.todolist.Data.entity.TaskWithCategory;
 import com.example.todolist.R;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,10 +22,10 @@ import java.util.Locale;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
-    // Thay đổi List<Task> thành List<TaskWithCategory>
     private List<TaskWithCategory> taskList;
     private final OnTaskClickListener listener;
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private boolean isGridView = false;
 
     public interface OnTaskClickListener {
         void onTaskStatusChanged(Task task);
@@ -35,8 +38,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         this.listener = listener;
     }
 
-    public void updateTasks(List<TaskWithCategory> newTasks) {
+    public TaskAdapter(List<Task> simpleTaskList, OnTaskClickListener listener, boolean isGridView) {
+        this.listener = listener;
+        this.isGridView = isGridView;
+        this.taskList = new ArrayList<>();
+        updateTasks(simpleTaskList);
+    }
+
+    public void updateTasksWithCategory(List<TaskWithCategory> newTasks) {
         this.taskList = newTasks;
+        notifyDataSetChanged();
+    }
+
+    public void updateTasks(List<Task> newTasks) {
+        this.taskList.clear();
+        if (newTasks != null) {
+            for (Task task : newTasks) {
+                this.taskList.add(new TaskWithCategory(task, null));
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -49,8 +69,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        TaskWithCategory item = taskList.get(position);
-        holder.bind(item, listener);
+        if (taskList != null && position < taskList.size()) {
+            TaskWithCategory item = taskList.get(position);
+            holder.bind(item, listener);
+        }
     }
 
     @Override
@@ -71,12 +93,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
 
         public void bind(TaskWithCategory item, OnTaskClickListener listener) {
+            if (item == null) return;
             Task task = item.task;
+            if (task == null) return;
 
             tvTitle.setText(task.getTitle());
             checkBox.setChecked(task.getIsCompleted() == 1);
 
-            // --- LẤY TÊN DANH MỤC TỪ BẢNG CATEGORY ---
             if (item.category != null) {
                 tvCategory.setText(item.category.getName());
                 tvCategory.setVisibility(View.VISIBLE);
@@ -84,7 +107,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 tvCategory.setVisibility(View.GONE);
             }
 
-            // Hiển thị thời gian (Logic cũ giữ nguyên)
             if (task.getDueDate() != null) {
                 Calendar c = Calendar.getInstance();
                 c.setTimeInMillis(task.getDueDate());

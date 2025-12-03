@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.todolist.R;
 import com.example.todolist.Ui.activity.Lich.LichActivity;
+import com.example.todolist.Ui.activity.MainActivity;
 import com.example.todolist.Ui.activity.thongke.ThongKeActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -40,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.navigation_tasks) {
-                if (!(this instanceof MainActivity)) {
+                if (!(this instanceof com.example.todolist.Ui.activity.MainActivity)) {
                     startActivity(new Intent(this, MainActivity.class));
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     finish();

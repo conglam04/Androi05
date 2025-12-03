@@ -14,10 +14,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.todolist.Data.Repository.UserRepository;
 import com.example.todolist.Data.entity.User;
 import com.example.todolist.R;
-// --- SỬA IMPORT NÀY ---
-import com.example.todolist.Data.Repository.UserRepository;
+import com.example.todolist.Ui.activity.Login.LoginActivity;
 import com.example.todolist.Ui.activity.MainActivity;
 import com.example.todolist.utils.SecurityUtils;
 
