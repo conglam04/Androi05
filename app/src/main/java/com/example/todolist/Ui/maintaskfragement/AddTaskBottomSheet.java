@@ -43,7 +43,7 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
     private List<Category> categories = new ArrayList<>();
     private Long selectedDueDate = null;
     private Long selectedReminderDate = null;
-    private long selectedCategoryId = -1;
+    private int selectedCategoryId = -1;  // Changed from long to int to match Task entity
     private String selectedCategoryName = "không có thẻ loại";
     private RecurrenceRule selectedRecurrenceRule;
 
@@ -294,19 +294,20 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
             return;
         }
 
+        // Ensure we have a valid category before proceeding
         if (selectedCategoryId == -1) {
             if (!categories.isEmpty()) {
                 selectedCategoryId = categories.get(0).getCategoryId();
+                selectedCategoryName = categories.get(0).getName();
             } else {
                 Toast.makeText(requireContext(),
-                        "Vui lòng chọn danh mục",
+                        "Đang tải danh mục, vui lòng thử lại",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
-        // Create new task
-        Task newTask = new Task(title, "", selectedCategoryId);
+        // Set default due date if not set
         if (selectedDueDate == null) {
             // Set default due date: today at 23:59 (end of day)
             Calendar cal = Calendar.getInstance();
@@ -316,6 +317,17 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
             cal.set(Calendar.MILLISECOND, 999);
             selectedDueDate = cal.getTimeInMillis();
         }
+
+        // Create new task with proper Integer categoryId
+        Task newTask = new Task(title, "", selectedCategoryId);
+
+        // Explicitly set categoryId again to ensure it's saved
+        newTask.setCategoryId(selectedCategoryId);
+
+        // Debug log
+        android.util.Log.d("AddTaskBottomSheet", "Saving task with categoryId: " + selectedCategoryId +
+                " (categoryName: " + selectedCategoryName + ")");
+        android.util.Log.d("AddTaskBottomSheet", "Task object categoryId: " + newTask.getCategoryId());
 
         // Set due date and reminder date to the task
         newTask.setDueDate(selectedDueDate);
