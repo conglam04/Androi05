@@ -380,17 +380,5 @@ public class AddTaskBottomSheet extends BottomSheetDialogFragment {
         return R.style.BottomSheetDialogTheme;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        View dialogView = getDialog() == null ? null : getDialog().findViewById(com.google.android.material.R.id.design_bottom_sheet);
-        if (dialogView != null) {
-            dialogView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            dialogView.requestLayout();
-            com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(dialogView);
-            behavior.setFitToContents(true);
-            behavior.setSkipCollapsed(true);
-            behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
-        }
-    }
+
 }
