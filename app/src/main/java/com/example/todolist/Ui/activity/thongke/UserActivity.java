@@ -21,6 +21,7 @@ import com.example.todolist.Data.Repository.UserRepository;
 import com.example.todolist.Data.entity.User;
 import com.example.todolist.R;
 import com.example.todolist.Ui.activity.Login.LoginActivity;
+import com.example.todolist.Ui.activity.MainActivity;
 import com.example.todolist.utils.SecurityUtils; // Import tiện ích bảo mật
 
 public class UserActivity extends AppCompatActivity {
@@ -239,7 +240,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     private void goToLoginScreen() {
-        Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+        Intent intent = new Intent(UserActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
