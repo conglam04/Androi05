@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.todolist.R;
 import com.example.todolist.Ui.activity.MainActivity;
+import com.example.todolist.Ui.activity.thongke.ThongKeActivity;
 
 public class HelloActivity extends AppCompatActivity {
     @Override
@@ -44,7 +45,7 @@ public class HelloActivity extends AppCompatActivity {
             startActivity(intent);
         });
         btnback.setOnClickListener(v -> {
-            Intent intent = new Intent(HelloActivity.this, MainActivity.class);
+            Intent intent = new Intent(HelloActivity.this, ThongKeActivity.class);
             startActivity(intent);
         });
     }

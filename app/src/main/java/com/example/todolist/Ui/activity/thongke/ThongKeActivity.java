@@ -1,6 +1,7 @@
 package com.example.todolist.Ui.activity.thongke;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -98,22 +99,19 @@ public class ThongKeActivity extends BaseActivity {
             } else {
                 lineChart.clear();
                 lineChart.setNoDataText("Chưa có dữ liệu thống kê");
-                // Cần invalidate để biểu đồ vẽ lại thông báo "No Data"
                 lineChart.invalidate();
             }
         });
     }
 
-    // Hàm gọi ViewModel để tải lại dữ liệu mới nhất
     private void reloadData() {
         if (taskViewModel == null) return;
 
         // 1. Load tất cả tasks (cho PieChart)
-        // Repository tự biết lấy của User hay Guest
         taskViewModel.loadTasks();
 
-        // 2. Load thống kê (cho LineChart) theo giá trị Spinner hiện tại
-        int days = 7; // Mặc định
+        // 2. Load thống kê (cho LineChart)
+        int days = 7;
         if (spFilterTime != null && spFilterTime.getSelectedItem() != null) {
             String selected = spFilterTime.getSelectedItem().toString();
             try {
@@ -139,11 +137,8 @@ public class ThongKeActivity extends BaseActivity {
             }
         }
 
-        // Cập nhật Text số lượng
         tvCompleted.setText(String.valueOf(completed));
         tvIncomplete.setText(String.valueOf(incomplete));
-
-        // Vẽ biểu đồ tròn
         ChartUtils.setupPieChart(pieChart, completed, incomplete);
     }
 
@@ -151,7 +146,6 @@ public class ThongKeActivity extends BaseActivity {
         spFilterTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Khi người dùng chọn lại thời gian -> Load lại biểu đồ đường
                 reloadData();
             }
 
@@ -162,41 +156,49 @@ public class ThongKeActivity extends BaseActivity {
 
     private void updateUserUI() {
         // Lấy thông tin từ SharedPreferences
-        String username = getSharedPreferences("USER_DATA", MODE_PRIVATE)
-                .getString("USERNAME", "");
-        int userId = getSharedPreferences("USER_DATA", MODE_PRIVATE)
-                .getInt("USER_ID", -1);
+        SharedPreferences prefs = getSharedPreferences("USER_DATA", MODE_PRIVATE);
+        String username = prefs.getString("USERNAME", "");
+        int userId = prefs.getInt("USER_ID", -1);
 
-        // Kiểm tra logic đăng nhập: Phải có username và userId hợp lệ (!= -1)
-        if (userId != -1 && username != null && !username.isEmpty()) {
-            // --- TRƯỜNG HỢP: ĐÃ ĐĂNG NHẬP ---
+        // Kiểm tra xem đã đăng nhập chưa
+        boolean isLoggedIn = (userId != -1 && username != null && !username.isEmpty());
+
+        if (isLoggedIn) {
+            // --- TRƯỜNG HỢP 1: ĐÃ ĐĂNG NHẬP ---
             tvGreeting.setText("Xin chào, " + username);
-            btnLoginRegister.setText("Đăng xuất");
-            // Đổi màu nút đăng xuất thành màu đỏ để cảnh báo
-            btnLoginRegister.setTextColor(getColor(android.R.color.holo_red_dark));
 
-            btnLoginRegister.setOnClickListener(v -> {
-                // Xử lý ĐĂNG XUẤT
-                getSharedPreferences("USER_DATA", MODE_PRIVATE).edit().clear().apply();
+            // Ẩn nút Đăng nhập/Đăng ký đi (vì đã đăng nhập rồi)
+            if (btnLoginRegister != null) {
+                btnLoginRegister.setVisibility(View.GONE);
+            }
 
-                Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-
-                // Cập nhật lại giao diện ngay lập tức
-                updateUserUI();
-                // Tải lại dữ liệu (Lúc này sẽ chuyển sang chế độ Guest)
-                reloadData();
+            // Click Avatar -> Sang trang Hồ sơ (UserActivity)
+            imgAvatar.setOnClickListener(v -> {
+                Intent intent = new Intent(ThongKeActivity.this, UserActivity.class);
+                startActivity(intent);
             });
-        } else {
-            // --- TRƯỜNG HỢP: CHƯA ĐĂNG NHẬP (KHÁCH) ---
-            tvGreeting.setText("Bạn đang xem ở chế độ Khách");
-            btnLoginRegister.setText("Đăng nhập / Đăng ký");
-            // Đổi màu nút về màu mặc định (Primary color)
-            btnLoginRegister.setTextColor(getColor(R.color.primary));
 
-            btnLoginRegister.setOnClickListener(v -> {
-                // Chuyển sang màn hình Hello/Login
+        } else {
+            // --- TRƯỜNG HỢP 2: KHÁCH (CHƯA ĐĂNG NHẬP) ---
+            tvGreeting.setText("Bạn đang xem ở chế độ Khách");
+
+            // Hiển thị nút Đăng nhập/Đăng ký
+            if (btnLoginRegister != null) {
+                btnLoginRegister.setVisibility(View.VISIBLE); // Quan trọng: Phải hiện lên
+                btnLoginRegister.setText("Đăng nhập / Đăng ký");
+
+                // Click nút -> Sang màn hình Đăng nhập
+                btnLoginRegister.setOnClickListener(v -> {
+                    startActivity(new Intent(this, HelloActivity.class));
+                });
+            }
+
+            // Click Avatar -> Cũng sang màn hình Đăng nhập (nhắc nhở)
+            imgAvatar.setOnClickListener(v -> {
+                Toast.makeText(this, "Vui lòng đăng nhập để xem hồ sơ", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, HelloActivity.class));
             });
         }
     }
-}
+    }
+

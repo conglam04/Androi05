@@ -22,6 +22,9 @@
         <activity
             android:name=".Ui.activity.thongke.ThongKeActivity"
             android:exported="false"/>
+        <activity
+            android:name=".Ui.activity.thongke.UserActivity"
+            android:exported="false"/>
         <activity android:name=".Ui.activity.Login.HelloActivity" android:exported="false"/>
         <activity android:name=".Ui.activity.Login.LoginActivity" android:exported="false"/>
         <activity android:name=".Ui.activity.Login.SignupActivity" android:exported="false"/>
