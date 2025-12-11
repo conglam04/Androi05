@@ -36,7 +36,7 @@ public class StarredTasksActivity extends AppCompatActivity implements TaskAdapt
         toolbar = findViewById(R.id.toolbar_starred);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Nhiệm vụ gắn sao");
+            getSupportActionBar().setTitle(R.string.nav_starred_tasks);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 

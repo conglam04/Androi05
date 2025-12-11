@@ -1,0 +1,33 @@
+<resources>
+    <string name="advanced_settings">Advanced Settings</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="language">Language</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="english">English</string>
+    <!-- Navigation Drawer -->
+    <string name="nav_header_title">To-Do List</string>
+    <string name="nav_theme">Theme</string>
+    <string name="nav_faq">FAQ</string>
+    <string name="nav_feedback">Feedback</string>
+    <string name="nav_starred_tasks">Starred Tasks</string>
+    <!-- Theme Screen -->
+    <string name="theme_title">Theme</string>
+    <!-- FAQ Screen -->
+    <string name="faq_title">Frequently Asked Questions</string>
+    <string name="faq_q1">Cannot hear reminder sounds</string>
+    <string name="faq_a1">Go to Phone Settings → Apps → To-Do List → Sound &amp; notifications, enable “Allow sound” and check if your phone is in Silent/Vibrate mode. You can also go to Settings in the app → Reminder Sound to select a different alert tone.</string>
+    <string name="faq_q2">Not receiving task notifications</string>
+    <string name="faq_a2">Please check:\n• Phone Settings → Notifications → To-Do List → is it enabled?\n• Battery → Battery optimization → select “Don’t optimize” for the To-Do List app.\n• Some Xiaomi, OPPO, Vivo phones require enabling “Autostart” and “Lock app in the background”.</string>
+    <string name="faq_q3">How to sync the to-do list between devices?</string>
+    <string name="faq_a3">Currently, the free version does not support synchronization. Syncing via Google/Firestore account will be available in the upcoming Pro version (expected update in January 2026).</string>
+    <string name="faq_q4">How to set weekly recurring reminders</string>
+    <string name="faq_a4">When adding/editing a task → tap “Repeat” → select “Weekly” → check the days of the week you want (Monday, Wednesday, Friday…) → Save. The task will automatically repeat on those specific days.</string>
+    <string name="faq_q5">How to change the app’s interface and colors?</string>
+    <string name="faq_a5">Go to Menu (≡) → Settings → Theme &amp; Color → choose one of the 10+ available themes (Blue, Pink, Dark, Purple Galaxy…). You can also enable “System default” to have the app automatically switch between light/dark mode according to your phone’s settings.</string>
+    <string name="faq_q6">Will my data be lost if I uninstall the app?</string>
+    <string name="faq_a6">→ If you only use the free version (local storage): your data will be lost upon uninstallation.\n→ If you have logged into an account and enabled sync (upcoming Pro version): your data will be saved on the cloud and will be restored upon reinstallation.</string>
+    <string name="faq_q7">Can I share my to-do list with friends?</string>
+    <string name="faq_a7">Yes! Go to the list → tap the Share button (send icon) → select “Export to text” or “Send shareable link” (coming in the December 2025 update). Currently, you can take a screenshot or copy individual tasks to send to your friends.</string>
+    <string name="faq_q8">Does the app support home screen widgets?</string>
+    <string name="faq_a8">Of course! Long-press an empty space on your home screen → select Widgets → drag the “To-Do List” widget out. There are 3 sizes: 4x1 (short list), 4x3 (with a quick add button), and a beautiful transparent widget.</string>
+</resources>

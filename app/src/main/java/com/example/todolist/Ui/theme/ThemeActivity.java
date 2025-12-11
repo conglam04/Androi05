@@ -26,7 +26,7 @@ public class ThemeActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_theme);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Chủ đề");
+            getSupportActionBar().setTitle(R.string.theme_title);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 

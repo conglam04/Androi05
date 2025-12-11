@@ -23,13 +23,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            android:text="Dark Mode" />
+            android:text="@string/dark_mode" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Language"
+            android:text="@string/language"
             android:textSize="16sp"
             android:textColor="?android:attr/textColorPrimary" />
 
@@ -43,13 +43,13 @@
                 android:id="@+id/radio_vietnamese"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vietnamese" />
+                android:text="@string/vietnamese" />
 
             <RadioButton
                 android:id="@+id/radio_english"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="English"
+                android:text="@string/english"
                 android:checked="true" />
 
         </RadioGroup>

@@ -3,22 +3,22 @@
         <item
             android:id="@+id/nav_theme"
             android:icon="@drawable/ic_theme"
-            android:title="Chủ đề" />
+            android:title="@string/nav_theme" />
         <item
             android:id="@+id/nav_faq"
             android:icon="@drawable/ic_faq"
-            android:title="FAQ" />
+            android:title="@string/nav_faq" />
         <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_feedback"
-            android:title="Phản hồi" />
+            android:title="@string/nav_feedback" />
         <item
             android:id="@+id/nav_advance_setting"
             android:icon="@drawable/ic_settings"
-            android:title="Cài đặt nâng cao" />
+            android:title="@string/advanced_settings" />
         <item
             android:id="@+id/nav_starred_tasks"
             android:icon="@drawable/ic_star"
-            android:title="Nhiệm vụ gắn sao" />
+            android:title="@string/nav_starred_tasks" />
     </group>
 </menu>
