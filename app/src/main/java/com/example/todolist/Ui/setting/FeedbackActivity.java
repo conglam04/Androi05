@@ -2,17 +2,22 @@ package com.example.todolist.Ui.setting;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.example.todolist.R;
+import com.example.todolist.Ui.theme.ThemeActivity;
 
 public class FeedbackActivity extends AppCompatActivity {
 
@@ -20,16 +25,19 @@ public class FeedbackActivity extends AppCompatActivity {
     private EditText senderEditText;
     private EditText subjectEditText;
     private EditText messageEditText;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_feedback);
+        toolbar = findViewById(R.id.toolbar_feedback);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Gửi phản hồi");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        applyTheme();
 
         recipientEditText = findViewById(R.id.recipient_edit_text);
         senderEditText = findViewById(R.id.sender_edit_text);
@@ -70,6 +78,34 @@ public class FeedbackActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Không tìm thấy ứng dụng email", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void applyTheme() {
+        SharedPreferences prefs = getSharedPreferences(ThemeActivity.PREFS_NAME, MODE_PRIVATE);
+        int defaultColor = ContextCompat.getColor(this, R.color.blue);
+        int themeColor = prefs.getInt(ThemeActivity.KEY_THEME_COLOR, defaultColor);
+
+        toolbar.setBackgroundColor(themeColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(themeColor);
+        }
+
+        if (isColorDark(themeColor)) {
+            toolbar.setTitleTextColor(Color.WHITE);
+            if (toolbar.getNavigationIcon() != null) {
+                toolbar.getNavigationIcon().setTint(Color.WHITE);
+            }
+        } else {
+            toolbar.setTitleTextColor(Color.BLACK);
+            if (toolbar.getNavigationIcon() != null) {
+                toolbar.getNavigationIcon().setTint(Color.BLACK);
+            }
+        }
+    }
+
+    private boolean isColorDark(@ColorInt int color) {
+        double luminance = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
+        return luminance < 0.5;
     }
 
     @Override
