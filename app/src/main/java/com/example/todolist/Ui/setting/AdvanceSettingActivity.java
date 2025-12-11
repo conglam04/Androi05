@@ -2,9 +2,12 @@ package com.example.todolist.Ui.setting;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.RadioGroup;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
@@ -17,21 +20,25 @@ import com.example.todolist.R;
 import com.example.todolist.Ui.theme.ThemeActivity;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+import java.util.Locale;
+
 public class AdvanceSettingActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "SettingPrefs";
     private static final String DARK_MODE_KEY = "dark_mode";
+    private static final String LANGUAGE_KEY = "language";
     private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadLocale();
         setContentView(R.layout.activity_advance_setting);
 
         toolbar = findViewById(R.id.toolbar_advance_setting);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Cài đặt nâng cao");
+            getSupportActionBar().setTitle(R.string.advanced_settings);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -54,6 +61,44 @@ public class AdvanceSettingActivity extends AppCompatActivity {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
         });
+
+        RadioGroup languageRadioGroup = findViewById(R.id.language_radio_group);
+        String currentLanguage = sharedPreferences.getString(LANGUAGE_KEY, "vi");
+        if (currentLanguage.equals("en")) {
+            languageRadioGroup.check(R.id.radio_english);
+        } else {
+            languageRadioGroup.check(R.id.radio_vietnamese);
+        }
+
+        languageRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            String lang;
+            if (checkedId == R.id.radio_english) {
+                lang = "en";
+            } else {
+                lang = "vi";
+            }
+            setLocale(lang);
+            recreate();
+        });
+    }
+
+    private void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+        config.setLocale(locale);
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
+
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putString(LANGUAGE_KEY, lang);
+        editor.apply();
+    }
+
+    private void loadLocale() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String language = prefs.getString(LANGUAGE_KEY, "vi");
+        setLocale(language);
     }
 
     private void applyTheme() {

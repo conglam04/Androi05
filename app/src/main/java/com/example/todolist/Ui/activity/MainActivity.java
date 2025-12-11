@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import com.example.todolist.utils.NotificationHelper;
 import com.example.todolist.utils.RecurringTaskScheduler;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import java.util.Locale;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -40,6 +42,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private BottomNavigationView bottomNavigationView;
     private Toolbar toolbar;
     private NavigationView navigationView;
+    private String currentLanguage;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -53,6 +56,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadLocale();
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -96,7 +100,28 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences prefs = getSharedPreferences("SettingPrefs", MODE_PRIVATE);
+        String language = prefs.getString("language", "vi");
+        if (!language.equals(currentLanguage)) {
+            currentLanguage = language;
+            recreate();
+        }
         applyTheme();
+    }
+
+    private void loadLocale() {
+        SharedPreferences prefs = getSharedPreferences("SettingPrefs", MODE_PRIVATE);
+        String language = prefs.getString("language", "vi");
+        currentLanguage = language;
+        setLocale(language);
+    }
+
+    private void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 
     private void applyTheme() {
