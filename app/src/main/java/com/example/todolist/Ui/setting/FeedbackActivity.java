@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.example.todolist.Data.Repository.UserRepository;
+import com.example.todolist.Data.entity.User;
 import com.example.todolist.R;
 import com.example.todolist.Ui.theme.ThemeActivity;
 
@@ -26,11 +28,13 @@ public class FeedbackActivity extends AppCompatActivity {
     private EditText subjectEditText;
     private EditText messageEditText;
     private Toolbar toolbar;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
+        userRepository = new UserRepository(getApplication());
 
         toolbar = findViewById(R.id.toolbar_feedback);
         setSupportActionBar(toolbar);
@@ -49,9 +53,12 @@ public class FeedbackActivity extends AppCompatActivity {
         recipientEditText.setText("todolistAdmin@gmail.com");
 
         // Lấy email người dùng từ SharedPreferences và đặt vào ô người gửi
-        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String userEmail = prefs.getString("user_email", ""); // Giả sử email được lưu với key là "user_email"
-        senderEditText.setText(userEmail);
+        SharedPreferences prefs = getSharedPreferences("USER_DATA", MODE_PRIVATE);
+        String username = prefs.getString("USERNAME", ""); // Giả sử email được lưu với key là "user_email"
+        User user = userRepository.findUserByUsername(username);
+        if (user != null) {
+            senderEditText.setText(user.getEmail());
+        }
 
         sendButton.setOnClickListener(v -> sendFeedback());
     }
